@@ -50,7 +50,7 @@ const SignUp = () => {
       <div style={{
         // width: "50px",
         // height: "50px",
-        fontFamily: geist-sans,
+        // fontFamily: geist-sans,
         backgroundImage: `url(${PusheenImage.src})`,
         backgroundSize: "cover",
         backgroundRepeat: "repeat",
@@ -59,12 +59,17 @@ const SignUp = () => {
       }}>
           
       <div className="sign-up-title">Sign Up</div>
-      <img src={CitrusVineLogo.src} style={{width: "100px", height:"100px", position:"center"}}></img>
-      <input className="input-field" value={firstName} placeholder="Enter first name..." type="text" onChange={onFirstNameFieldChange} />  
-      <input className="input-field" value={lastName} placeholder="Enter last name..." type="text" onChange={onLastNameFieldChange} />
-      <input className="input-field" value={userName} placeholder="Enter username..." type="text" onChange={onUserNameFieldChange} />  
-      <input className="input-field" value={password} placeholder="Enter password..." type="text" onChange={onPasswordFieldChange} />
-      <input className="input-field" value={email} placeholder="Enter email.." type="text" onChange={onEmailFieldChange} />
+      <img src={CitrusVineLogo.src} className="citrus-logo"></img>
+      
+      <div>
+        <div className="first-name-field"> First Name </div>
+        <input className="first-name-field" value={firstName} placeholder="Enter first name..." type="text" onChange={onFirstNameFieldChange} />  
+        <input className="last-name-field" value={lastName} placeholder="Enter last name..." type="text" onChange={onLastNameFieldChange} />
+        <input className="user-name-field" value={userName} placeholder="Enter username..." type="text" onChange={onUserNameFieldChange} />  
+        <input className="password-field" value={password} placeholder="Enter password..." type="text" onChange={onPasswordFieldChange} />
+        <input className="email-field" value={email} placeholder="Enter email.." type="text" onChange={onEmailFieldChange} />
+      </div>
+      
 
       </div>
       {/* <img src={PusheenImage.src}></img> */}
