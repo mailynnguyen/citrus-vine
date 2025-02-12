@@ -1,0 +1,62 @@
+
+.sign-up-title {
+  font-family: "IndieFlower";
+  position: center;
+  font-size: 120px;
+  color: white;
+}
+.sign-up-citrus-vine-logo {
+  position: center;
+  width: 150px;
+}
+.sign-up-title-container {
+  padding-top: 5%;
+  margin-top: 0%;
+  margin-left: 0%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sign-up-background {
+  background-image: url(../images/pusheen-background-upscaled.png);
+  background-size: "cover";
+  background-repeat: "repeat";
+  background-position: "center";
+  min-height: "100vh"
+}
+
+.sign-up-text {
+  color:white;
+}
+
+.sign-up-field-container {
+  margin-left: 25%; 
+  margin-right: 25%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 100px 300px
+}
+
+.sign-up-button {
+  border-radius: 40px; 
+  
+  font-family: "IndieFlower";
+  font-weight: bold;
+
+  background-color: white;
+  height: 50px;
+  width: 140px;
+}
+.sign-up-button-container {
+  padding-top: 5%;
+  margin-top: 0%;
+  margin-left: 0%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

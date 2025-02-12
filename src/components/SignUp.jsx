@@ -1,82 +1,89 @@
 "use client";
-import "../styles/style.css";
+import "../styles/sign-up.css";
 
 import { useState } from 'react'
-// import React from 'react'
 
-const GetWindowDimensions = () => {
-  const {innerwidth, innerHeight} = window
+import PusheenImage from "../images/pusheen-background-upscaled-dimmed.png"
+import CitrusVineLogo from "../images/citrus-vine-logo-scaled.png"
+
+
+// const PageBackground = (img) => {
+//   const [backgroundValue, setBackgroundValue] = useState(`url(${img})`)
+//   return (
+//     <div body = {{
+//       backgroundImage: backgroundValue,
+//       backgroundSize: "cover",
+//       backgroundRepeat: "repeat",
+//       backgroundPosition: "center",
+//       minHeight: "100vh"
+//     }}>
+//     </div>
+//   )
+// }
+
+const InputField = ({fieldName, fieldPlaceHolder, fieldWidth}) => {
+
+  const [fieldValue, setFieldValue] = useState("")
+  const onFieldValueChange = event => {
+    setFieldValue(event.target.value)
+  }
   return (
-    innerwidth,
-    innerHeight
+    <div>
+      <div className="sign-up-text" style={{fontWeight: "bold", color:"white"}}>{fieldName}</div>
+      <input value={fieldValue} placeholder={fieldPlaceHolder} type="text" onChange={onFieldValueChange} style={{width:`${fieldWidth}`, height:"30px", borderRadius:"10px", paddingLeft:"10px"}} />  
+    </div>
   )
 }
 
-import PusheenImage from "../images/pusheen-background-upscaled.png"
-import CitrusVineLogo from "../images/citrus-vine-logo-scaled.png"
-import { Geist } from "next/font/google";
+const Button = ({buttonText, buttonAction}) => {
+  const onHover = event => {
+    //Change button color
+  }
+  return (
+    <div>
+      <button onClick={buttonAction} className="sign-up-button">{buttonText}</button>
+    </div>
+  )
+}
+
+const SubmitData = () => {
+  // Verifying data
+  // Entering data into database
+  // Alert: Congratulations you have an account notif
+}
 
 const SignUp = () => {
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [userName, setUserName] = useState("")
-  const [password, setPassword] = useState("")
-  const [email, setEmail] = useState("")
-
-
-  const onFirstNameFieldChange = event => {
-    setFirstName(event.target.value)
-  }
-  const onLastNameFieldChange = event => {
-    setLastName(event.target.value)
-  }
-  const onUserNameFieldChange = event => {
-    setUserName(event.target.value)
-  } 
-  const onPasswordFieldChange = event => {
-    setPassword(event.target.value)
-  }
-  const onEmailFieldChange = event => {
-    setEmail(event.target.value)
-  }
-
 
   return (
 
+    <div style ={{
+      backgroundImage: `url(${PusheenImage.src})`,
+      backgroundSize: "cover",
+      backgroundRepeat: "repeat",
+      backgroundPosition: "center",
+      minHeight: "100vh",
+    }}>
 
-    <div className="SignUp">
+        <div className="sign-up-title-container">
+          <div className="sign-up-title">Sign Up</div>
+          <img src={CitrusVineLogo.src} className="sign-up-citrus-vine-logo"></img>
+        </div>
+        
+        
+        <div className="sign-up-field-container">
+          <InputField fieldName="First Name" fieldPlaceHolder="Enter first name..."/>
+          <InputField fieldName="Last Name" fieldPlaceHolder="Enter last name..."/>
+          <InputField fieldName="Username" fieldPlaceHolder="Enter user name..."/>
+          <InputField fieldName="Password" fieldPlaceHolder="Enter password..."/>
+          <InputField fieldName="Email" fieldPlaceHolder="Enter email..." fieldWidth="710px"/>
+        </div>
 
+        <div className="sign-up-button-container">
+          <Button buttonText="Create Account " buttonAction={SubmitData}></Button>
+        </div>
 
-      <div style={{
-        // width: "50px",
-        // height: "50px",
-        // fontFamily: geist-sans,
-        backgroundImage: `url(${PusheenImage.src})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "repeat",
-        backgroundPosition: "center",
-        minHeight: "100vh"
-      }}>
-          
-      <div className="sign-up-title">Sign Up</div>
-      <img src={CitrusVineLogo.src} className="citrus-logo"></img>
-      
-      <div>
-        <div className="first-name-field"> First Name </div>
-        <input className="first-name-field" value={firstName} placeholder="Enter first name..." type="text" onChange={onFirstNameFieldChange} />  
-        <input className="last-name-field" value={lastName} placeholder="Enter last name..." type="text" onChange={onLastNameFieldChange} />
-        <input className="user-name-field" value={userName} placeholder="Enter username..." type="text" onChange={onUserNameFieldChange} />  
-        <input className="password-field" value={password} placeholder="Enter password..." type="text" onChange={onPasswordFieldChange} />
-        <input className="email-field" value={email} placeholder="Enter email.." type="text" onChange={onEmailFieldChange} />
-      </div>
-      
-
-      </div>
-      {/* <img src={PusheenImage.src}></img> */}
-
-
-      {/* <button> Click here! </button> */}
     </div>
+
   )
 }
 
