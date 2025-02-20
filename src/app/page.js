@@ -1,10 +1,10 @@
 import Comment from "@/components/Comment"
+import ProfileHeader from "@/components/ProfileHeader";
 
 export default function Home() {
   return (
     <div>
-      Home Page
-      <Comment />
+      <ProfileHeader />
     </div>
   );
 }
