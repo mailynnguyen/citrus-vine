@@ -5,7 +5,7 @@ import { MessageCircle } from "lucide-react";
 import '@/styles/post.css';
 
 
-const Post = () => {
+const Post = ({ body }) => {
 
     const [like, setLike] = useState(false);
 
@@ -23,7 +23,7 @@ const Post = () => {
                 </div>
 
                 <p id ="content">
-                    The trees...
+                    {body}
                 </p>
 
                 <div id="buttons">
