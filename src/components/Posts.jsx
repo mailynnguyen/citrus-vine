@@ -1,6 +1,5 @@
 "use client"
 import Post from "@/components/Post";
-import { Axis3DIcon } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
