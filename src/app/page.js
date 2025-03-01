@@ -1,11 +1,12 @@
-import SignUp from "@/components/SignUp";
-import Comment from "@/components/Comment";
-import ProfileHeader from "@/components/ProfileHeader";
+import PostModal from "@/components/PostModal";
+import Posts from "@/components/Posts";
 
 export default function Home() {
   return (
     <div>
-      <ProfileHeader />
+      <PostModal />
+      <Posts />
+      
     </div>
   );
 }

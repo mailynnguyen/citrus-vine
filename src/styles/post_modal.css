@@ -1,0 +1,39 @@
+#outer-box {
+    background-color: #7CA7E1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    aspect-ratio: 16/9;
+    padding: 3.5%;
+    position: relative;
+    border-radius: 1rem;
+}
+
+#x {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+}
+
+#text {
+    width: 100%;
+    aspect-ratio: 16/9;
+    padding: 1%;
+    border-radius: 0.8rem;
+    resize: none;
+}
+
+#text:focus {
+    outline: none;
+}
+
+#buttons {
+    display: flex;
+    gap: 6%;
+    position: absolute;
+    right: 9%;
+    bottom: 2%;
+    white-space: nowrap;
+    
+}
