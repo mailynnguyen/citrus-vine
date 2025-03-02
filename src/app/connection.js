@@ -24,21 +24,6 @@ var db = mysql.createConnection({
   port,
 });
 
-// var hostname = "e7mhj.h.filess.io";
-// var database = "CitrusVineDB_oxygenbend";
-// var port = "3307";
-// var username = "CitrusVineDB_oxygenbend";
-// var password = "51eb7f921a83851a80e14c57d7c81c80624c1c12";
-
-// var db = mysql.createConnection({
-//   host: hostname,
-//   user: username,
-//   password,
-//   database,
-//   port,
-// });
-
-var db_path = 
 db.connect(function (err) {
   if (err) throw err;
   console.log(`Connected to db: ${hostname}:${port}!`);
@@ -53,138 +38,97 @@ app.listen(3307, () => {
 })
       
 // Paths
-const post_path = "/sosts"
-const post_likes_path = "/PostLikes"
 
-const comment_path = "/Comments"
-const comment_likes_path = "/CommentLikes"
+        /*
+                If exportable, will have the benefit of just stating a variable's
+                name in all other functions.
+        */
+        const Posts = "/Posts"
+        const PostsFetchAll = Posts + "/Fetch"
+        const PostsIncrementLikes = Posts + "/IncrementLikes"
+        const PostsDecrementLikes = Posts = "/DecrementLikes"
+
+        const Comments = "/Comments"
+        const CommentsFetchAll = Comments + "/Fetch"
+        const CommentsIncrementLikes = Comments + "/IncrementLikes"
+        const CommentsDecrementLikes = Comments + "/DecrementLikes"
+
 
 // Posts
 
-//Helper
-// app.get(post_likes_path, (req, res) => {
-//         const join_query = "SELECT p.PostID FROM Posts P WHERE p.PostID = (`post_id`)"
-//         const values = [
-//                 req.body.post_id
-//         ]
-//         db.query(join_query, (err, data) => {
-//                 if (err) { return res.json(err)}
-//                 else { return res.json(`Incremented Po = ${values[req.body.post_id]}`)}
-//         });
-// });
+        /*
+                Requires no parameters besides path.
+        */
+        app.get(PostsFetchAll, (req, res) => {
+                db.query("SELECT * FROM Posts", (err, data) => {
+                        if (err) {
+                                result = res.json(err)
+                        }
+                        else {
+                                result = res.json(data)
+                        }
+                });
+                return result;
 
-
-//Jobs
-
-app.get(post_path, (req, res) => {
-        
-        const values = [
-                req.body.query
-        ]
-        const query = values
-        // return res.json(`${query}`)
-        db.query("SELECT * FROM Posts", (err, data) => {
-                if (err) { 
-                        return res.json(err) 
-                }
-                else {
-                        result = res.json(data)
-                        // return res.json(`Completed retrieval job!${res}`) 
-                        return result;
-                }
         });
 
-});
+        /*
+                Requires React Component: Path
+        */
+        app.post(PostsIncrementLikes, (req, res) => {
+                const value = req.body.PostID
+                db.query(`UPDATE PostLikes
+                         SET Likes = (SELECT Likes From PostLikes WHERE PostID = ${value}) + 1 
+                         WHERE PostID = ${value}`,
+                (err, data) => {});
+        });
+        app.post(PostsDecrementLikes, (req, res) => {
+                const value = req.body.PostID
+                db.query(`UPDATE PostLikes
+                         SET Likes = (SELECT Likes From PostLikes WHERE PostID = ${value}) - 1 
+                         WHERE PostID = ${value}`,
+                (err, data) => {});
+        });
 
-// app.post(post_path, (req, res) => {
-//         const values = [
-//                 req.body.query
-//         ]
-//         const query = values[0]
-//         db.query(query, (err, data) => {
-//                 if (err) { return res.json(err) }
-//                 else { return res.json(`Completed modify job!`) }
-//         });
-// });
 
-var latest_post_id = 13
-app.post(post_path, (req, res) => {
-        const values = req.body
-        const query = values
-        // const query = `INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous) VALUES (${latest_post_id}, 1, '03/04/25', 'test', false)`
-        return res.json(values)
-        latest_post_id += 1
-        db.query(query, (err, data) => {
-                if (err) { return res.json(err) }
-                else { return res.json(`Completed modify job!, ${query}`) }
-        }); 
-})
-// app.post(post_path, (req, res) => {
-//         const values = [
-//                 req.body.query
-//         ]
-//         const query = values[0]
-//         db.query(query, (err, data) => {
-//                 if (err) { return res.json(err) }
-//                 else { return res.json(`Completed modify job!`) }
-//         });
-// });
+// Comments
 
-// app.post(post_path, (req, res) => {
-        
-//         const values = [
-//                 req.body.job,
-//                 req.body.post_id
-//         ]
-//         const job_string = req.body.job
-//         const post_id = toString(values[1])
-//         const join_query = `SELECT p.PostID FROM Posts P WHERE p.PostID = ${post_id}`
+        /*
+                Requires no parameters besides path.
+        */
+        app.get(CommentsFetchAll, (req, res) => {
+                db.query("SELECT * FROM Comments", (err, data) => {
+                        if (err) {
+                                result = res.json(err)
+                        }
+                        else {
+                                result = res.json(data)
+                        }
+                });
+                return result;
 
-//         // var post_with_likes_table = con.GetPostsWithLikes(post_likes_path, values[1])
-//         switch(job_string) {
-//                 case "Increment":
-//                         const increment_query = "UPDATE " + join_query + "as p " + "SET p.Likes = p.Likes + 1 WHERE p.PostID = " + post_id
-//                         db.query(increment_query, (err, data) => {
-//                                 if (err) { return res.json(err) }
-//                                 else { return res.json(`Incremented Likes for PostID = ${post_id}`)}
-//                         });
-//                         break;
-                
-//                 case "Decrement":
-//                         const decrement_query = "UPDATE " + join_query + "as p " + "SET p.Likes = p.Likes - 1 WHERE p.PostID = " + post_id
-//                         db.query(decrement_query, (err, data) => {
-//                                 if (err) { return res.json(err) }
-//                                 else { return res.json(`Decremented Likes for PostID = ${post_id}`)}
-//                         });
-//                         break;
-//         }
-// });
+        });
 
-// app.post(comment_path, (req, res) => {
+        /*
+                Requires React Component: Path
+        */
+        app.post(CommentsIncrementLikes, (req, res) => {
+                const value = req.body.CommentID
+                db.query(`UPDATE CommentLikes
+                                SET Likes = (SELECT Likes From CommentLikes WHERE CommentID = ${value}) + 1 
+                                WHERE CommentId = ${value}`,
+                (err, data) => {});
+        });
+        app.post(CommentsDecrementLikes, (req, res) => {
+                const value = req.body.CommentID
+                db.query(`UPDATE CommentLikes
+                                SET Likes = (SELECT Likes From CommentLikes WHERE CommentID = ${value}) - 1 
+                                WHERE CommentId = ${value}`,
+                (err, data) => {});
+        });
 
-//         const values = [
-//                 req.body.job,
-//                 req.body.comment_id
-//         ]
-//         const job_string = req.body.job
-//         const comment_id = toString(req.body.comment_id)
-//         const join_query = `SELECT c.CommentID FROM Comments C WHERE c.CommentID = ${comment_id}`
 
-//         switch(job_string) {
-//                 case "Increment":
-//                         const increment_query = "UPDATE " + join_query + "as c " + "SET p.Likes = c.Likes + 1 WHERE c.CommentID = " + comment_id
-//                         db.query(increment_query, (err, data) => {
-//                                 if (err) { return res.json(err) }
-//                                 else { return res.json(`Incremented Likes for PostID = ${comment_id}`)}
-//                         });
-//                         break;
-                
-//                 case "Decrement":
-//                         const decrement_query = "UPDATE " + join_query + "as c " + "SET c.Likes = c.Likes - 1 WHERE c.CommentID = " + comment_id
-//                         db.query(decrement_query, (err, data) => {
-//                                 if (err) { return res.json(err) }
-//                                 else { return res.json(`Decremented Likes for PostID = ${comment_id}`)}
-//                         });
-//                         break;
-//         }
-// });
+
+
+
+
