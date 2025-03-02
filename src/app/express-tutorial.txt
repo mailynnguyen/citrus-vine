@@ -1,0 +1,64 @@
+------------------------- Express Tutorial -------------------------
+
+Example 1:
+
+        Say we are given the function:
+
+                /*
+                        .get parameters: [path: str, {"PostID": int}]
+                        .get return: [res.json: {int}]
+                */
+                app.post(PostsIncrementLikes, (req, res) => {
+                        const value = req.body.PostID
+                        db.query(`UPDATE PostLikes
+                                        SET Likes = Likes + 1 
+                                        FROM Posts
+                                        WHERE PostID = ${value}`,
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(value + 1)
+                                }
+                        });
+                });
+
+
+        To call this function:
+
+                import axios from 'axios';
+
+                axios.post("http://localhost:3307/Posts/IncrementLikes, {"PostID" = 3})
+
+        or if you import src/app/paths:
+
+                import axios from 'axios';
+                import {PostsIncrementLikes} from "@/app/paths"
+
+                axios.post(PostsIncrementLikes, {"PostID" = 3})
+
+
+        The output of this function assuming the post had 4 likes:
+
+                import axios from 'axios';
+                import {PostsIncrementLikes} from "@/app/paths"
+                var res = axios.post(PostsIncrementLikes, {"PostID" = 3})
+
+                console.log(res)
+
+                        This would output a json object with a bunch of unneeded attributes. Don't do this.
+
+                console.log(res.data)
+
+                        The output of this log would be: 4
+
+                        Always do .data to retrieve the json file data. Because there was only
+                        one piece of data in this json, doing .data was sufficient to get the value.
+
+                        If the json file has actual key-value pairs, then you would need to do:
+
+                                res.data.[attribute_here]         # Not including the brackets
+                        
+                        You will run into this case when performing FetchAll express functions.
+
