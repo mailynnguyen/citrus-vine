@@ -2,11 +2,13 @@
 const express = require("express")
 const mysql = require("mysql2")
 const cors = require("cors");
+// const promise = require("mysql2/promise")
 const { M_PLUS_1 } = require("next/font/google");
 
 const app = express()
 app.use(cors());
 app.use(express.json());
+// app.use(promise());
 
 
 //Database Server
@@ -29,9 +31,9 @@ db.connect(function (err) {
   console.log(`Connected to db: ${hostname}:${port}!`);
 });
 
-db.query("SELECT 1+1").on("result", function (row) {
-  console.log(row);
-});
+// db.query("SELECT 1+1").on("result", function (row) {
+//   console.log(row);
+// });
 
 app.listen(3307, () => {
   console.log(`App connected to db! Please visit http://localhost:3307/ to see returns.`)
@@ -133,27 +135,54 @@ const Prior = ""
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
 
-                db.query(`INSERT INTO PostLikes (UserID, PostID, Likes)
-                        VALUES (${user_id}, ${post_id}, 0)`,
-                (err, data) => {});
+                db.query(`
+                        INSERT INTO PostLikes (UserID, PostID, Likes)
+                        VALUES (
+                                ${user_id}, 
+                                ${post_id}, 
+                                0
+                        )`,
 
-                db.query(`INSERT INTO CitrusVineDB_oxygenbend.Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
-                        VALUES (${post_id}, ${user_id}, CURRENT_TIMESTAMP(), ${content}, ${anonymous}, ${username})
-                        `,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                attributes = {
-                                        "PostID": comment_id,
-                                        "UserID": user_id,
-                                        "Content": content,
-                                        "Anonymous": anonymous
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
                                 }
-                                return res.json(attributes)
                         }
-                });
+                );
+
+                db.query(`
+                        INSERT INTO CitrusVineDB_oxygenbend.Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
+                        VALUES (
+                                ${post_id}, 
+                                ${user_id}, 
+                                CURRENT_TIMESTAMP(), 
+                                ${content}, 
+                                ${anonymous}, 
+                                ${username}
+                        )`,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                );
+
+                db.query(`
+                        SELECT * 
+                        FROM Posts
+                        WHERE PostID = ${post_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                )
         });
 
 
@@ -166,40 +195,52 @@ const Prior = ""
                 const content = req.body.Content
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
+                db.query(`
+                        INSERT INTO PostLikes (UserID, PostID, Likes)
+                        VALUES (
+                                ${user_id}, 
+                                (SELECT MAX(A.PostID) FROM Posts A), 
+                                0
+                        )`,
 
-                var post_id = 0
-                post_id = db.query(`SELECT MAX(PostID) as Max FROM Posts`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                post_id = data[0].Max + 1
-                                return res.json(data[Max + 1])
-                        }
-                });
-                post_id = post_id.data
-
-                db.query(`INSERT INTO PostLikes (UserID, PostID, Likes)
-                        VALUES (${user_id}, ${post_id}, 0)`,
-                (err, data) => {});
-
-                db.query(`INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
-                        VALUES (${post_id}, ${user_id}, CURRENT_TIMESTAMP(), ${content}, ${anonymous}, ${username})
-                        `,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                attributes = {
-                                        "PostID": comment_id,
-                                        "UserID": user_id,
-                                        "Content": content,
-                                        "Anonymous": anonymous
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
                                 }
-                                return res.json(attributes)
                         }
-                });
+                );
+                db.query(`
+                        INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
+                        VALUES (
+                                ${post_id}, 
+                                ${user_id}, 
+                                CURRENT_TIMESTAMP(), 
+                                ${content}, 
+                                ${anonymous}, 
+                                ${username}
+                        )`,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                );
+                db.query(`
+                        SELECT *
+                        FROM Posts
+                        WHERE PostID = (SELECT MAX(A.PostID) FROM Posts A
+                        )`,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                )
         });
 
 
@@ -321,36 +362,63 @@ const Prior = ""
                 const username = req.body.Username
                 
                 var likes = 0
-                db.query(`INSERT INTO CommentLikes (UserID, CommentID, Likes)
-                        VALUES (${user_id}, ${comment_id}, ${likes})`,
-                (err, data) => {});
+                db.query(`
+                        INSERT INTO CommentLikes (UserID, CommentID, Likes)
+                        VALUES (
+                                ${user_id}, 
+                                ${comment_id}, 
+                                ${likes}
+                        )`,
+                        (err, data) => {}
+                );
 
-                db.query(`INSERT INTO Comments (CommentID, UserID, Timestamp, PostID, Content, Anonymous, Username) 
-                        VALUES (${comment_id}, ${user_id}, CURRENT_TIMESTAMP(), ${post_id}, ${content}, ${anonymous}, ${username})
-                        `,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                db.query(`
+                        INSERT INTO Comments (CommentID, UserID, Timestamp, PostID, Content, Anonymous, Username) 
+                        VALUES (
+                                ${comment_id}, 
+                                ${user_id}, 
+                                CURRENT_TIMESTAMP(), 
+                                ${post_id}, 
+                                ${content}, 
+                                ${anonymous}, 
+                                ${username}
+                        )`,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
                         }
-                });
+                );
 
-                db.query(`SELECT Timestamp FROM Comments WHERE CommentID = ${comment_id}`, (err, data) => {
+                db.query(`
+                        SELECT Timestamp 
+                        FROM Comments 
+                        WHERE CommentID = ${comment_id}`, 
+                        
+                        (err, data) => {
                         if (err) {
                                 return res.json(err)
                         }
                         else {
-                                attributes = {
-                                        "CommentID": comment_id,
-                                        "UserID": user_id,
-                                        "PostID": post_id,
-                                        "Timestamp": data.Timestamp,
-                                        "Content": content,
-                                        "Anonymous": anonymous
-                                }
-                                return res.json(attributes)
+                                db.query(`
+                                        SELECT * 
+                                        FROM Comments 
+                                        WHERE CommentID = (SELECT MAX(A.CommentID) FROM Comments A
+                                )`,
+
+                                (err, data) => {
+                                        if (err) {
+                                                return res.json(err)
+                                        }
+                                        else {
+                                                return res.json(data)
+                                        }
+                                });
                         }
                 });
         });
+
 
         /*
                 .post parameters: [Path: str, {"UserID": int, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
@@ -364,46 +432,53 @@ const Prior = ""
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
                 
-                var comment_id = 0
-                db.query(`SELECT MAX(CommentID) as Max FROM Comments`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                comment_id = data[0].Max + 1
-                        }
-                });
-
                 var likes = 0
-                db.query(`INSERT INTO CommentLikes (UserID, CommentID, Likes)
-                        VALUES (${user_id}, ${comment_id}, ${likes})`,
-                (err, data) => {});
+                db.query(`
+                        INSERT INTO CommentLikes (UserID, CommentID, Likes)
+                        VALUES (
+                                ${user_id}, 
+                                (SELECT MAX(A.CommentID) + 1 FROM Comments A), 
+                                ${likes}
+                        )`,
 
-                db.query(`INSERT INTO Comments (CommentID, UserID, Timestamp, PostID, Content, Anonymous, Username) 
-                        VALUES (${comment_id}, ${user_id}, CURRENT_TIMESTAMP(), ${post_id}, ${content}, ${anonymous}, ${username})
-                        `,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                });
+                        (err, data) => {}
+                );
 
-                db.query(`SELECT Timestamp FROM Comments WHERE CommentID = ${comment_id}`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                attributes = {
-                                        "CommentID": comment_id,
-                                        "UserID": user_id,
-                                        "PostID": post_id,
-                                        "Timestamp": data.Timestamp,
-                                        "Content": content,
-                                        "Anonymous": anonymous
+                db.query(`
+                        INSERT INTO Comments (CommentID, UserID, Timestamp, PostID, Content, Anonymous, Username) 
+                        VALUES (
+                                (SELECT MAX(A.CommentID) + 1 FROM Comments A), 
+                                ${user_id}, 
+                                CURRENT_TIMESTAMP(), 
+                                ${post_id}, 
+                                ${content}, 
+                                ${anonymous}, 
+                                ${username}
+                        )`,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
                                 }
-                                return res.json(attributes)
                         }
-                });
+                );
+
+                db.query(`
+                        SELECT *
+                        FROM Comments 
+                        WHERE CommentID = (
+                                SELECT MAX(A.CommentID) FROM Comments A
+                        )`, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
         });
 
 
@@ -508,17 +583,39 @@ const Prior = ""
                 const password = req.body.Password
                 const bio = req.body.Bio
                 const email = req.body.Email
-                db.query(`INSERT INTO Users (UserID, Username, Password, Bio, Email)
-                        VALUES (${user_id}, ${username}, ${password}, ${bio}, ${email})`, 
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                db.query(`
+                        INSERT INTO Users (UserID, Username, Password, Bio, Email)
+                        VALUES (
+                                ${user_id}, 
+                                ${username}, 
+                                ${password}, 
+                                ${bio}, 
+                                ${email}
+                        )`, 
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
                         }
-                        else {
-                                return res.json(data)
+                );
+                db.query(`
+                        SELECT * 
+                        FROM Users 
+                        WHERE UserID = ${user_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                });
+                )
         });
+
 
         /*
                 .post parameters: [Path: str, {"Username": str, "Password": str, "Bio": str, "Email": str}]
@@ -540,17 +637,37 @@ const Prior = ""
                         }
                 });
 
-                db.query(`INSERT INTO Users (UserID, Username, Password, Bio, Email)
-                        VALUES (${user_id}, ${username}, ${password}, ${bio}, ${email})`, 
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                db.query(`
+                        INSERT INTO Users (UserID, Username, Password, Bio, Email)
+                        VALUES 
+                                ((SELECT MAX(A.UserID) + 1 FROM Users A), 
+                                ${username}, 
+                                ${password}, 
+                                ${bio}, 
+                                ${email})`, 
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        db.query(`
+                                                SELECT * 
+                                                FROM Users 
+                                                WHERE UserID = (SELECT MAX(AUserID) FROM Users A)`,
+                                        (err, data) => {
+                                                if (err) {
+                                                        return res.json(err)
+                                                }
+                                                else {
+                                                        return res.json(data)
+                                                }
+                                        });
+                                }
                         }
-                        else {
-                                return res.json(data)
-                        }
-                });
+                );
         });
+
 
         /*
                 .post parameters: [Path: str, {"Username": str, "Password": str, "Email": str}]
@@ -561,26 +678,36 @@ const Prior = ""
                 const password = req.body.Password
                 const email = req.body.Email
 
-                var user_id = 0
-                db.query(`SELECT MAX(UserID) as Max FROM Users`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                user_id = data[0].Max + 1
-                        }
-                });
+                db.query(`
+                        INSERT INTO Users (UserID, Username, Password, Bio, Email)
+                        VALUES 
+                                ((SELECT MAX(A.UserID) + 1 FROM Users A), 
+                                ${username}, 
+                                ${password}, 
+                                "\'\'", 
+                                ${email})`, 
 
-                db.query(`INSERT INTO Users (UserID, Username, Password, Bio, Email)
-                        VALUES (${user_id}, ${username}, ${password}, ${bio}, ${email})`, 
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
                         }
-                        else {
-                                return res.json(data)
+                );
+                db.query(`
+                        SELECT *
+                        FROM Users
+                        WHERE UserID = (SELECT MAX(A.UserID) + 1 FROM Users A
+                        )`,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                });
+                )
         });
 
 
@@ -849,42 +976,121 @@ const Prior = ""
         //         // });
         // });
 
+        /*
+                Helper: DO NOT USE IN PRODUCTION
+        */
+        // async function GetMaxPostID () {
+        //         return new Promise((resolve, reject) => {
+        //                 db.query("SELECT MAX(PostID) as Max FROM Posts", (err, data) => {
+        //                         if (err) {
+        //                                 reject(err)
+        //                         } else {
+        //                                 console.log("Max PostID:", data[0].Max)
+        //                                 resolve(data[0].Max)
+        //                         }
+        //                 });
+        //         });
+        // }
+        
+        // GetMaxPostID()
+        // .then((result) => {return res.json(result)})
+        // .catch((result) => console.log("Unsuccesfully ran GetMaxUserID()\n"))
+
+        // app.post ("") {
+        //         db.query("SELECT MAX(PostID) as Max FROM Posts", (err, data) => {
+        //                 return data;
+        //         }); 
+        // }
+
+        // app.post("/Example", (req, res) => {
+        //         const user_id = req.body.UserID
+        //         const content = req.body.Content
+        //         const anonymous = req.body.Anonymous
+        //         const username = req.body.Username
+
+                
+        //         // var get_post_id = () => {db.query(`SELECT MAX(PostID) as Max FROM Posts`, (err, data) => {
+        //         //         if (err) {
+        //         //                 return res.json(err)
+        //         //         }
+        //         //         else {
+        //         //                 post_id = data[0].Max + 1
+        //         //                 return res.json(data[0].Max + 1)
+        //         //         }
+        //         // });};
+        //         var post_id = GetMaxPostID()
+        //         console.log("PostID: ", post_id)
+
+        //         db.query(`INSERT INTO PostLikes (UserID, PostID, Likes)
+        //                 VALUES (${user_id}, ${post_id}, 0)`,
+        //         (err, data) => {});
+
+        //         db.query(`INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
+        //                 VALUES (${post_id}, ${user_id}, CURRENT_TIMESTAMP(), ${content}, ${anonymous}, ${username})
+        //                 `,
+        //         (err, data) => {
+        //                 if (err) {
+        //                         return res.json(err)
+        //                 }
+        //                 else {
+        //                         attributes = {
+        //                                 "PostID": post_id,
+        //                                 "UserID": user_id,
+        //                                 "Content": content,
+        //                                 "Anonymous": anonymous
+        //                         }
+        //                         return res.json(attributes)
+        //                 }
+        //         });
+        // });
+
         app.post("/Example", (req, res) => {
                 const user_id = req.body.UserID
                 const content = req.body.Content
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
 
-                var post_id = 0
-                post_id = db.query(``, (err, data) => {
-                        if (err) {
-                                res.json(err)
-                        }
-                        else {
-                                post_id = data[0].Max + 1
-                                res.json(data[0].Max + 1)
-                        }
-                });
+                
+                // var get_post_id = () => {db.query(`SELECT MAX(PostID) as Max FROM Posts`, (err, data) => {
+                //         if (err) {
+                //                 return res.json(err)
+                //         }
+                //         else {
+                //                 post_id = data[0].Max + 1
+                //                 return res.json(data[0].Max + 1)
+                //         }
+                // });};
+                // var post_id = GetMaxPostID()
+                // console.log("PostID: ", post_id)
 
-                db.query(`INSERT INTO PostLikes (UserID, (), Likes)
-                        VALUES (${user_id}, ${post_id}, 0)`,
+                db.query(`INSERT INTO PostLikes (UserID, PostID, Likes)
+                        VALUES (${user_id}, 
+                                (SELECT MAX(PostID) + 1 as MAX FROM Posts), 
+                                0)`,
                 (err, data) => {});
 
                 db.query(`INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
-                        VALUES (${post_id}, ${user_id}, CURRENT_TIMESTAMP(), ${content}, ${anonymous}, ${username})
-                        `,
+                        VALUES ((SELECT MAX(P.PostID) + 1 FROM Posts P), 
+                                ${user_id}, CURRENT_TIMESTAMP(), 
+                                ${content}, 
+                                ${anonymous}, 
+                                ${username})`,
                 (err, data) => {
                         if (err) {
                                 return res.json(err)
                         }
                         else {
-                                attributes = {
-                                        "PostID": post_id,
-                                        "UserID": user_id,
-                                        "Content": content,
-                                        "Anonymous": anonymous
-                                }
-                                return res.json(attributes)
+                                db.query(`SELECT * 
+                                        FROM Posts 
+                                        WHERE PostID = (SELECT MAX(P.PostID) FROM Posts P)`,
+                                (err,data) => {
+                                        if (err) {
+                                                return res.json(err)
+                                        } 
+                                        else {
+                                                return res.json(data)
+                                        }
+                                });
                         }
                 });
         });
