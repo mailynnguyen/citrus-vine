@@ -80,13 +80,26 @@ const Prior = ""
                 Options
         */
         const Posts = Prior + "/Posts"
-        const PostsFetchAll = Posts + "/FetchAll"
-        const PostsFetchOnID = Posts + "/FetchOnID"
-        const PostsFetchLikes = Posts + "/FetchLikes"
-        const PostsInsertManual = Posts + "/InsertManual"
-        const PostsInsertForward = Posts + "/InsertForward"
-        const PostsIncrementLikes = Posts + "/IncrementLikes"
-        const PostsDecrementLikes = Posts + "/DecrementLikes"
+                const PostsFetchAll = Posts + "/FetchAll"
+                const PostsFetchAscLikes = Posts + "/FetchAscLikes"
+                const PostsFetchDescLikes = Posts + "/FetchDescLikes"
+                const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
+                const PostsFetchDescTimestamp = Posts + "/FetchOnDescTimestamp"
+
+
+                const PostsFetchOnPostID = Posts + "/FetchOnPostID"
+                const PostsFetchOnUserID = Posts + "/FetchOnUserID"
+                const PostsFetchOnUsername = Posts + "/FetchOnUsername"
+                const PostsFetchAscTimestampOnUserID = Posts + "/FetchOnAscTimestampOnUserID"
+                const PostsFetchDescTimestampOnUserID = Posts + "/FetchOnDescTimestampOnUserID"
+
+                const PostsGetLikes = Posts + "/FetchLikes"
+
+                const PostsInsertManual = Posts + "/InsertManual"
+                const PostsInsertForward = Posts + "/InsertForward"
+
+                const PostsIncrementLikes = Posts + "/IncrementLikes"
+                const PostsDecrementLikes = Posts + "/DecrementLikes"
 
 
         /*
@@ -106,12 +119,104 @@ const Prior = ""
                 return result;
         });
 
+        
+        /* 
+                .get parameters: [Path: str]
+                .get return: [res.json {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchAscLikes, (req, res) => {
+                db.query(`
+                        SELECT * 
+                        FROM Posts 
+                        INNER JOIN PostLikes
+                        ORDER BY Likes ASC
+                        `), 
+                
+                (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                }
+        });
+        
+
+        /* 
+                .get parameters: [Path: str]
+                .get return: [res.json {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchDescLikes, (req, res) => {
+                db.query(`
+                        SELECT * 
+                        FROM Posts 
+                        INNER JOIN PostLikes
+                        ORDER BY Likes DESC
+                        `), 
+                
+                (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                }
+        });
+
 
         /*
-                .post parameters: [Path: sr, {"PostID": int}]
+                .post parameters: [Path: str]
                 .post return: [res.json: {ReactComponentAttributes}]
         */
-        app.get(PostsFetchOnID, (req, res) => {
+        app.get(PostsFetchAscTimestamp, (req, res) => {
+                db.query(`
+                        SELECT * 
+                        FROM Posts 
+                        ORDER BY Timestamp ASC
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .post parameters: [Path: str]
+                .post return: [res.json: {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchDescTimestamp, (req, res) => {
+                db.query(`
+                        SELECT * 
+                        FROM Posts 
+                        ORDER BY Timestamp DESC
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"PostID": int}]
+                .post return: [res.json: {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchOnPostID, (req, res) => {
                 const post_id = req.body.PostID
                 db.query(`SELECT * FROM Posts WHERE PostID = ${post_id}`, (err, data) => {
                         if (err) {
@@ -121,6 +226,104 @@ const Prior = ""
                                 return res.json(data)
                         }
                 });
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int}]
+                .post return: [res.json: {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`SELECT * FROM Posts WHERE UserID = ${user_id}`, (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                });
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"Username": int}]
+                .post return: [res.json: {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchOnUsername, (req, res) => {
+                const username = req.body.Username
+                db.query(`SELECT * FROM Posts WHERE Username = ${username}`, (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                });
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int}]
+                .post return: [res.json: {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchOnUsername, (req, res) => {
+                const username = req.body.Username
+                db.query(`SELECT * FROM Posts WHERE Username = ${username}`, (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                });
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int}]
+                .post return: [res.json: {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchAscTimestampOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`
+                        SELECT * 
+                        FROM Posts 
+                        WHERE UserID = ${user_id}
+                        ORDER BY Timestamp ASC`, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+        /*
+                .post parameters: [Path: str, {"UserID": int}]
+                .post return: [res.json: {ReactComponentAttributes}]
+        */
+        app.get(PostsFetchDescTimestampOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`
+                        SELECT * 
+                        FROM Posts 
+                        WHERE UserID = ${user_id}
+                        ORDER BY Timestamp DESC`, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
         });
 
 
@@ -248,7 +451,7 @@ const Prior = ""
                 .get parameters: [path: str, {"PostID": int}]
                 .get return: [res.json: {"Likes" : int}]
         */
-        app.post(PostsFetchLikes, (req, res) => {
+        app.post(PostsGetLikes, (req, res) => {
                 const post_id = req.body.PostID
                 db.query(`SELECT Likes 
                         FROM PostLikes 
@@ -309,12 +512,25 @@ const Prior = ""
                 Options
         */
         const Comments = Prior + "/Comments"
-        const CommentsFetchAll = Comments + "/Fetch"
-        const CommentsFetchOnID = Comments + "/FetchOnID"
-        const CommentsInsertManual = Comments + "/InsertManual"
-        const CommentsInsertForward = Comments + "/InsertForward"
-        const CommentsIncrementLikes = Comments + "/IncrementLikes"
-        const CommentsDecrementLikes = Comments + "/DecrementLikes"
+                const CommentsFetchAll = Comments + "/Fetch"
+                const CommentsFetchAscLikes = Comments + "/FetchAscLikes"
+                const CommentsFetchDescLikes = Comments + "/FetchDescLikes"
+                const CommentsFetchAscTimestamp = Comments + "/FetchOnAscTimestamp"
+                const CommentsFetchDescTimestamp = Comments + "/FetchOnDescTimestamp"
+
+
+                const CommentsFetchOnID = Comments + "/FetchOnID"
+                const CommentsFetchOnUserID = Comments + "/FetchOnUserID"
+                const CommentsFetchOnPostID = Comments + "/FetchOnPostID"
+                const CommentsFetchOnUsername = Comments + "/FetchOnUsername"
+                const CommentsFetchAscTimestampOnPostID = Posts + "/FetchAscTimestampOnPostID"
+                const CommentsFetchDescTimestampOnPostID = Posts + "/FetchDescTimestampOnPostID"
+
+                const CommentsInsertManual = Comments + "/InsertManual"
+                const CommentsInsertForward = Comments + "/InsertForward"
+
+                const CommentsIncrementLikes = Comments + "/IncrementLikes"
+                const CommentsDecrementLikes = Comments + "/DecrementLikes"
 
         /*
                 .get parameters: [Path: str]
