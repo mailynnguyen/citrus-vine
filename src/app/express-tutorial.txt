@@ -6,7 +6,7 @@ Example 1:
 
                 /*
                         .get parameters: [path: str, {"PostID": int}]
-                        .get return: [res.json: {int}]
+                        .get return: [res.json: {"PostLikes": int}]
                 */
                 app.post(PostsIncrementLikes, (req, res) => {
                         const value = req.body.PostID
@@ -38,6 +38,17 @@ Example 1:
 
                 axios.post(PostsIncrementLikes, {"PostID" = 3})
 
+        or if you are using a react component variable:
+
+                import axios from 'axios';
+                import {PostsIncrementLikes} from "@/app/paths"
+
+                const [post_id, setPost] = useState(3)
+                const [post_content, setID] = useState("Hi there!)
+                
+                axios.post(PostsIncrementLikes, {"PostID": post_id})
+
+
 
         The output of this function assuming the post had 4 likes:
 
@@ -50,15 +61,25 @@ Example 1:
                         This would output a json object with a bunch of unneeded attributes. Don't do this.
 
                 console.log(res.data)
+                        
+                        The output of this would be {"PostLikes": 4}
+
+                console.log(res.data.PostLikes)
 
                         The output of this log would be: 4
 
-                        Always do .data to retrieve the json file data. Because there was only
-                        one piece of data in this json, doing .data was sufficient to get the value.
-
-                        If the json file has actual key-value pairs, then you would need to do:
+                        Always do .data and then specify the return type's key to retrieve the json 
+                        file data. In this case, the return type has a key. If the return type doesn't
+                        have a key, then you can simply do "res.data".
+                        
+                        So bascially, if the json file return type has key-value pairs, then you would 
+                        need to do:
 
                                 res.data.[attribute_here]         # Not including the brackets
+
+                        otherwise doing:
+
+                                res.data
                         
-                        You will run into this case when performing FetchAll express functions.
+                        is satisfactory.
 
