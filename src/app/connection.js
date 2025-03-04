@@ -107,16 +107,23 @@ const Prior = ""
                 .get return: [res.json: {ReactComponentsAttributes}]
         */
         app.get(PostsFetchAll, (req, res) => {
-                var result;
-                db.query("SELECT * FROM Posts", (err, data) => {
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        `, 
+                        
+                (err, data) => {
                         if (err) {
-                                result = res.json(err)
+                                return res.json(err)
                         }
                         else {
-                                result = res.json(data)
+                                return res.json(data)
                         }
                 });
-                return result;
         });
 
         
@@ -218,13 +225,22 @@ const Prior = ""
         */
         app.get(PostsFetchOnPostID, (req, res) => {
                 const post_id = req.body.PostID
-                db.query(`SELECT * FROM Posts WHERE PostID = ${post_id}`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                return res.json(data)
-                        }
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM CitrusVineDB_oxygenbend.Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM CitrusVineDB_oxygenbend.Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN CitrusVineDB_oxygenbend.PostLikes B ON A.PostID = B.PostID
+                        WHERE A.PostID = ${post_id}`,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                 });
         });
 
