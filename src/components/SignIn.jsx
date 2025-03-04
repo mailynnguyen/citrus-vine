@@ -2,13 +2,14 @@
 import React, { useState } from "react";
 import { Heart } from 'lucide-react';
 import '@/styles/signin.css';
+import CitrusBg from "../images/citrus-bg.jpeg";
 
 function SignIn() {
     const [user, enterUser] = useState("");
     const [password, enterPassword] = useState("");
 
     return(
-        <body id="bg-holder">
+        <body id="bg-holder" style={{backgroundImage: `url(${CitrusBg.src})`}}>
             <div class="sign-in-text">Citrus Vine</div>
 
             <form class="sign-in-form">

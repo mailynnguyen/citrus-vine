@@ -4,7 +4,7 @@ import "../styles/sign-up.css";
 import { useState } from 'react'
 
 import PusheenImage from "../images/pusheen-background-upscaled-dimmed.png"
-import CitrusVineLogo from "../images/citrus-vine-logo-scaled.png"
+import CitrusVineLogo from "../images/BearCutie Logo.svg"
 
 
 // const PageBackground = (img) => {
@@ -28,9 +28,9 @@ const InputField = ({fieldName, fieldPlaceHolder, fieldWidth}) => {
     setFieldValue(event.target.value)
   }
   return (
-    <div>
-      <div className="sign-up-text" style={{fontWeight: "bold", color:"white"}}>{fieldName}</div>
-      <input value={fieldValue} placeholder={fieldPlaceHolder} type="text" onChange={onFieldValueChange} style={{width:`${fieldWidth}`, height:"30px", borderRadius:"10px", paddingLeft:"10px"}} />  
+    <div class="input-field" style={{width:`${fieldWidth}`}}>
+      <div className="sign-up-text">{fieldName}</div>
+      <input value={fieldValue} placeholder={fieldPlaceHolder} type="text" onChange={onFieldValueChange} class= "sign-up-input" /*style={{width:`${fieldWidth}`, height:"30px", borderRadius:"10px", paddingLeft:"10px"}}*/ />  
     </div>
   )
 }
@@ -56,18 +56,12 @@ const SignUp = () => {
 
   return (
 
-    <div style ={{
-      backgroundImage: `url(${PusheenImage.src})`,
-      backgroundSize: "cover",
-      backgroundRepeat: "repeat",
-      backgroundPosition: "center",
-      minHeight: "100vh",
-    }}>
+    <body id="sign-up-background" style ={{backgroundImage: `url(${PusheenImage.src})`}}>
 
-        <div className="sign-up-title-container">
-          <div className="sign-up-title">Sign Up</div>
-          <img src={CitrusVineLogo.src} className="sign-up-citrus-vine-logo"></img>
-        </div>
+        
+        <div class="sign-up-title">Sign Up</div><br></br>
+        <img src={CitrusVineLogo.src} class="sign-up-citrus-vine-logo"></img>
+        
         
         
         <div className="sign-up-field-container">
@@ -75,14 +69,14 @@ const SignUp = () => {
           <InputField fieldName="Last Name" fieldPlaceHolder="Enter last name..."/>
           <InputField fieldName="Username" fieldPlaceHolder="Enter user name..."/>
           <InputField fieldName="Password" fieldPlaceHolder="Enter password..."/>
-          <InputField fieldName="Email" fieldPlaceHolder="Enter email..." fieldWidth="710px"/>
+          <InputField fieldName="Email" fieldPlaceHolder="Enter email..." fieldWidth="100%"/>
         </div>
 
         <div className="sign-up-button-container">
           <Button buttonText="Create Account " buttonAction={SubmitData}></Button>
         </div>
 
-    </div>
+    </body>
 
   )
 }

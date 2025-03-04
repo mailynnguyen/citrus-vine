@@ -1,15 +1,21 @@
 
 .sign-up-title {
-  font-family: "IndieFlower";
-  position: center;
-  font-size: 120px;
+  display: block;
+  font-size: 5rem;
+  font-family: 'Indie Flower';
+  text-align: center;
+  margin-top: 1%;
   color: white;
+  pointer-events: none;
+  user-select: none;
 }
 .sign-up-citrus-vine-logo {
   position: center;
-  width: 150px;
+  margin: 0 auto;
+  width: max(8vw, 75px);
 }
-.sign-up-title-container {
+
+/*.sign-up-title-container {
   padding-top: 5%;
   margin-top: 0%;
   margin-left: 0%;
@@ -17,44 +23,62 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-.sign-up-background {
-  background-image: url(../images/pusheen-background-upscaled.png);
-  background-size: "cover";
-  background-repeat: "repeat";
-  background-position: "center";
-  min-height: "100vh"
+}*/
+
+#sign-up-background {
+  /*background-image: url(../images/pusheen-background-upscaled.png);*/
+  background-color: #7CA7E1;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  /*min-height: "100vh";*/
 }
 
 .sign-up-text {
   color:white;
+  font-weight: bold;
 }
 
 .sign-up-field-container {
-  margin-left: 25%; 
-  margin-right: 25%;
+  margin: 0 25%;
 
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 100px 300px
+
+  font-size: 1.2rem;
+}
+
+/*.input-field:last-of-type {
+  width: 100%;
+}*/
+
+.sign-up-input {
+  font-size: inherit;
+  padding: .5rem 1rem;
+  border-radius: 1.5em;
+  width: 100%;
+}
+
+.input-field {
+  box-sizing: border-box;
+  margin: 2%;
+  width: max(40%, 200px);
 }
 
 .sign-up-button {
-  border-radius: 40px; 
+  font-size: 1.4rem;
+  border-radius: 1.5em; 
   
   font-family: "IndieFlower";
   font-weight: bold;
 
   background-color: white;
-  height: 50px;
-  width: 140px;
+  padding: .5em 1em;
 }
 .sign-up-button-container {
-  padding-top: 5%;
-  margin-top: 0%;
-  margin-left: 0%;
+  margin: 2rem .5rem;
 
   display: flex;
   flex-direction: column;
