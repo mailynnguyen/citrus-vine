@@ -10,8 +10,8 @@ const Posts = () => {
     useEffect(() => {
         const fetchAllPosts = async() => {
             try {
-                const res = await axios.get("http://localhost:8800/posts")
-                // console.log(res)
+                const res = await axios.get("http://localhost:3307/Posts/FetchAll")
+                console.log(res)
                 setPosts(res.data)
             } catch (err) {
                 console.log(err)
@@ -22,12 +22,17 @@ const Posts = () => {
     },[]);
 
     return (
+          
         <div>
-            {posts.map((post, index) => (
-                <Post 
-                    key={index}
-                    body={post.body}
-                />
+            {posts
+                .sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)) // Sort by date_time from earliest to latest
+                .map((post, index) => (
+                    <Post 
+                        key={index}
+                        body={post.Content}
+                        display_name={post.Username}
+                        date_time={new Date(post.Timestamp).toISOString().slice(0, 19).replace('T', ' ')} // doing the splice b/c instance of Date
+                    />
             ))}
         </div>
     )

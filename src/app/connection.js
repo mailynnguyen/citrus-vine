@@ -506,15 +506,16 @@ const Prior = ""
                 const content = req.body.Content
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
+                
                 db.query(`
                         INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
                         VALUES (
                                 (SELECT MAX(A.PostID) + 1 FROM Posts A), 
                                 ${user_id}, 
                                 CURRENT_TIMESTAMP(), 
-                                ${content}, 
+                                '${content}', 
                                 ${anonymous}, 
-                                ${username}
+                                '${username}'
                         )`,
 
                         (err, data) => {
