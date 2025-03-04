@@ -86,12 +86,13 @@ const Prior = ""
                 const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
                 const PostsFetchDescTimestamp = Posts + "/FetchOnDescTimestamp"
 
-
                 const PostsFetchOnPostID = Posts + "/FetchOnPostID"
                 const PostsFetchOnUserID = Posts + "/FetchOnUserID"
                 const PostsFetchOnUsername = Posts + "/FetchOnUsername"
                 const PostsFetchAscTimestampOnUserID = Posts + "/FetchOnAscTimestampOnUserID"
                 const PostsFetchDescTimestampOnUserID = Posts + "/FetchOnDescTimestampOnUserID"
+                const PostsFetchAscLikesOnUserID = Posts + "/FetchOnAscLikesOnUserID"
+                const PostsFetchDescLikesOnUserID = Posts + "/FetchOnDescLikesOnUserID"
 
                 const PostsGetLikes = Posts + "/FetchLikes"
 
@@ -101,10 +102,11 @@ const Prior = ""
                 const PostsIncrementLikes = Posts + "/IncrementLikes"
                 const PostsDecrementLikes = Posts + "/DecrementLikes"
 
+                const PostDeleteOnPostID = Posts + "/DeleteOnPostID"
 
         /*
                 .get parameters: [path: str] 
-                .get return: [res.json: {ReactComponentsAttributes}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
         app.get(PostsFetchAll, (req, res) => {
                 db.query(`
@@ -129,13 +131,16 @@ const Prior = ""
         
         /* 
                 .get parameters: [Path: str]
-                .get return: [res.json {ReactComponentAttributes}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
         app.get(PostsFetchAscLikes, (req, res) => {
                 db.query(`
-                        SELECT * 
-                        FROM Posts 
-                        INNER JOIN PostLikes
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
                         ORDER BY Likes ASC
                         `), 
                 
@@ -152,13 +157,16 @@ const Prior = ""
 
         /* 
                 .get parameters: [Path: str]
-                .get return: [res.json {ReactComponentAttributes}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
         app.get(PostsFetchDescLikes, (req, res) => {
                 db.query(`
-                        SELECT * 
-                        FROM Posts 
-                        INNER JOIN PostLikes
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
                         ORDER BY Likes DESC
                         `), 
                 
@@ -174,14 +182,18 @@ const Prior = ""
 
 
         /*
-                .post parameters: [Path: str]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .get parameters: [Path: str]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
         app.get(PostsFetchAscTimestamp, (req, res) => {
                 db.query(`
-                        SELECT * 
-                        FROM Posts 
-                        ORDER BY Timestamp ASC
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        ORDER BY A.Timestamp ASC
                         `, 
                         
                         (err, data) => {
@@ -197,14 +209,18 @@ const Prior = ""
 
 
         /*
-                .post parameters: [Path: str]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .get parameters: [Path: str]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
         app.get(PostsFetchDescTimestamp, (req, res) => {
                 db.query(`
-                        SELECT * 
-                        FROM Posts 
-                        ORDER BY Timestamp DESC
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        ORDER BY A.Timestamp DESC
                         `, 
                         
                         (err, data) => {
@@ -221,17 +237,17 @@ const Prior = ""
 
         /*
                 .post parameters: [Path: str, {"PostID": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
-        app.get(PostsFetchOnPostID, (req, res) => {
+        app.post(PostsFetchOnPostID, (req, res) => {
                 const post_id = req.body.PostID
                 db.query(`
                         SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
                         CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
                         CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM CitrusVineDB_oxygenbend.Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM CitrusVineDB_oxygenbend.Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN CitrusVineDB_oxygenbend.PostLikes B ON A.PostID = B.PostID
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
                         WHERE A.PostID = ${post_id}`,
                         
                         (err, data) => {
@@ -247,66 +263,18 @@ const Prior = ""
 
         /*
                 .post parameters: [Path: str, {"UserID": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
-        app.get(PostsFetchOnUserID, (req, res) => {
-                const user_id = req.body.UserID
-                db.query(`SELECT * FROM Posts WHERE UserID = ${user_id}`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                return res.json(data)
-                        }
-                });
-        });
-
-
-        /*
-                .post parameters: [Path: str, {"Username": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
-        */
-        app.get(PostsFetchOnUsername, (req, res) => {
-                const username = req.body.Username
-                db.query(`SELECT * FROM Posts WHERE Username = ${username}`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                return res.json(data)
-                        }
-                });
-        });
-
-
-        /*
-                .post parameters: [Path: str, {"UserID": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
-        */
-        app.get(PostsFetchOnUsername, (req, res) => {
-                const username = req.body.Username
-                db.query(`SELECT * FROM Posts WHERE Username = ${username}`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                return res.json(data)
-                        }
-                });
-        });
-
-
-        /*
-                .post parameters: [Path: str, {"UserID": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
-        */
-        app.get(PostsFetchAscTimestampOnUserID, (req, res) => {
+        app.post(PostsFetchOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT * 
-                        FROM Posts 
-                        WHERE UserID = ${user_id}
-                        ORDER BY Timestamp ASC`, 
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.UserID = ${user_id}`,
                         
                         (err, data) => {
                                 if (err) {
@@ -319,17 +287,137 @@ const Prior = ""
                 );
         });
 
+
+        /*
+                .post parameters: [Path: str, {"Username": int}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.post(PostsFetchOnUsername, (req, res) => {
+                const username = req.body.Username
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.Username = ${username}`,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
         /*
                 .post parameters: [Path: str, {"UserID": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
-        app.get(PostsFetchDescTimestampOnUserID, (req, res) => {
+        app.post(PostsFetchAscTimestampOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT * 
-                        FROM Posts 
-                        WHERE UserID = ${user_id}
-                        ORDER BY Timestamp DESC`, 
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.UserID = ${user_id}
+                        ORDER BY A.Timestamp ASC
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.post(PostsFetchDescTimestampOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.UserID = ${user_id}
+                        ORDER BY A.Timestamp DESC
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.post(PostsFetchAscLikesOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.UserID = ${user_id}
+                        ORDER BY Likes ASC
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int}]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.post(PostsFetchDescLikesOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.UserID = ${user_id}
+                        ORDER BY Likes DESC
+                        `,
                         
                         (err, data) => {
                                 if (err) {
@@ -345,7 +433,7 @@ const Prior = ""
 
         /*
                 .post parameters: [Path: str, {"PostID": int, "UserID": int, "Content": str, "Anonymous": bool, "Username": str}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .get return: [{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
         */
         app.post(PostsInsertManual, (req, res) => {
                 const post_id = req.body.PostID
@@ -370,65 +458,6 @@ const Prior = ""
                 );
 
                 db.query(`
-                        INSERT INTO CitrusVineDB_oxygenbend.Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
-                        VALUES (
-                                ${post_id}, 
-                                ${user_id}, 
-                                CURRENT_TIMESTAMP(), 
-                                ${content}, 
-                                ${anonymous}, 
-                                ${username}
-                        )`,
-
-                        (err, data) => {
-                                if (err) {
-                                        return res.json(err)
-                                }
-                        }
-                );
-
-                db.query(`
-                        SELECT * 
-                        FROM Posts
-                        WHERE PostID = ${post_id}
-                        `,
-
-                        (err, data) => {
-                                if (err) {
-                                        return res.json(err)
-                                } 
-                                else {
-                                        return res.json(data)
-                                }
-                        }
-                )
-        });
-
-
-        /*
-                .post parameters: [Path: str, {"UserID": int, "Content": str, "Anonymous": bool, "Username": str}]
-                .post return: [res.json: {ReactComponentAttributes}]
-        */
-        app.post(PostsInsertForward, (req, res) => {
-                const user_id = req.body.UserID
-                const content = req.body.Content
-                const anonymous = req.body.Anonymous
-                const username = req.body.Username
-                db.query(`
-                        INSERT INTO PostLikes (UserID, PostID, Likes)
-                        VALUES (
-                                ${user_id}, 
-                                (SELECT MAX(A.PostID) FROM Posts A), 
-                                0
-                        )`,
-
-                        (err, data) => {
-                                if (err) {
-                                        return res.json(err)
-                                }
-                        }
-                );
-                db.query(`
                         INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
                         VALUES (
                                 ${post_id}, 
@@ -445,11 +474,78 @@ const Prior = ""
                                 }
                         }
                 );
+
                 db.query(`
-                        SELECT *
-                        FROM Posts
-                        WHERE PostID = (SELECT MAX(A.PostID) FROM Posts A
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.PostID = ${post_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                )
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int, "Content": str, "Anonymous": bool, "Username": str}]
+                .get return: [{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.post(PostsInsertForward, (req, res) => {
+                const user_id = req.body.UserID
+                const content = req.body.Content
+                const anonymous = req.body.Anonymous
+                const username = req.body.Username
+                db.query(`
+                        INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
+                        VALUES (
+                                (SELECT MAX(A.PostID) + 1 FROM Posts A), 
+                                ${user_id}, 
+                                CURRENT_TIMESTAMP(), 
+                                ${content}, 
+                                ${anonymous}, 
+                                ${username}
                         )`,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                );
+                db.query(`
+                        INSERT INTO PostLikes (UserID, PostID, Likes)
+                        VALUES (
+                                ${user_id}, 
+                                (SELECT MAX(A.PostID) FROM Posts A), 
+                                0
+                        )`,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                );
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        WHERE A.PostID = (SELECT MAX(PostID) FROM Posts)
+                        `,
                         
                         (err, data) => {
                                 if (err) {
@@ -465,13 +561,15 @@ const Prior = ""
 
         /*
                 .get parameters: [path: str, {"PostID": int}]
-                .get return: [res.json: {"Likes" : int}]
+                .get return: [{"Likes" : int}]
         */
         app.post(PostsGetLikes, (req, res) => {
                 const post_id = req.body.PostID
-                db.query(`SELECT Likes 
-                        FROM PostLikes 
-                        WHERE PostID = ${post_id}`, 
+                db.query(`
+                        SELECT COUNT(*)
+                        FROM PostLikes
+                        WHERE PostID = ${post_id}
+                        `,
                 (err, data) => {
                         if (err) {
                                 return res.json(err)
@@ -485,39 +583,122 @@ const Prior = ""
 
 
         /*
-                .post parameters: [path: str, {"PostID": int}]
-                .post return: [res.json: {int}]
+                .post parameters: [path: str, {"UserID": int, "PostID": int}]
+                .post return: [{"NumLikes": int}]
         */
         app.post(PostsIncrementLikes, (req, res) => {
-                const value = req.body.PostID
-                db.query(`UPDATE PostLikes
-                                SET Likes = Likes + 1 
-                                FROM Posts
-                                WHERE PostID = ${value}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                const user_id = req.body.UserID
+                const post_id = req.body.PostID
+                db.query(` 
+                        INSERT PostLikes (UserID, PostID, Likes)
+                        VALUES (${user_id}, ${post_id}, 1)
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        db.query(`
+                                                SELECT COUNT(*) as NumLikes
+                                                FROM PostLikes
+                                                WHERE PostID = ${post_id}
+                                                AND Likes = 1
+                                                `,
+                                                
+                                                (err, data) => {
+                                                        if (err) {
+                                                                return res.json
+                                                        }
+                                                        else {
+                                                                return res.json(data)
+                                                        }
+                                                }
+                                        
+                                        );
+                                }
                         }
-                        else {
-                                return res.json(value + 1)
-                        }
-                });
+                );
         });
         app.post(PostsDecrementLikes, (req, res) => {
-                const value = req.body.PostID
-                db.query(`UPDATE PostLikes
-                                SET Likes = Likes - 1 
-                                FROM Posts
-                                WHERE PostID = ${value}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                const user_id = req.body.UserID
+                const post_id = req.body.PostID
+                db.query(` 
+                        DELETE PostLikes 
+                        WHERE UserID = ${user_id} AND PostID = ${post_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        db.query(`
+                                                SELECT COUNT(*) as NumLikes
+                                                FROM PostLikes
+                                                WHERE PostID = ${post_id}
+                                                AND Likes = 1
+                                                `,
+                                                
+                                                (err, data) => {
+                                                        if (err) {
+                                                                return res.json
+                                                        }
+                                                        else {
+                                                                return res.json(data)
+                                                        }
+                                                }
+                                        
+                                        );
+                                }
                         }
-                        else {
-                                return res.json(value - 1)
-                        }
-                });
+                );
         });
+
+
+        /*
+                .post parameters: [Path: str, "PostID": str}]
+                .get return: ["Outcome": bool]
+        */
+        app.post(PostDeleteOnPostID, (res, data) => {
+                const post_id = res.body.PostID
+                db.query(`
+                        DELETE FROM Posts
+                        WHERE PostID = ${post_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                )
+                db.query(`
+                        DELETE FROM PostsLikes
+                        WHERE PostID = ${post_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                )
+                db.query(`
+                        SELECT COUNT(*) = 0 AS Outcome
+                        FROM Posts
+                        WHERE PostID = ${post_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } else {
+                                        return res.json(data)
+                                }
+                        }
+                )
+        })
 
 
 
@@ -529,15 +710,12 @@ const Prior = ""
         */
         const Comments = Prior + "/Comments"
                 const CommentsFetchAll = Comments + "/Fetch"
-                const CommentsFetchAscLikes = Comments + "/FetchAscLikes"
-                const CommentsFetchDescLikes = Comments + "/FetchDescLikes"
-                const CommentsFetchAscTimestamp = Comments + "/FetchOnAscTimestamp"
-                const CommentsFetchDescTimestamp = Comments + "/FetchOnDescTimestamp"
-
 
                 const CommentsFetchOnID = Comments + "/FetchOnID"
                 const CommentsFetchOnUserID = Comments + "/FetchOnUserID"
                 const CommentsFetchOnPostID = Comments + "/FetchOnPostID"
+                const CommentsFetchAscLikesOnPostID = Comments + "/FetchAscLikes"
+                const CommentsFetchDescLikesOnPostID = Comments + "/FetchDescLikes"
                 const CommentsFetchOnUsername = Comments + "/FetchOnUsername"
                 const CommentsFetchAscTimestampOnPostID = Posts + "/FetchAscTimestampOnPostID"
                 const CommentsFetchDescTimestampOnPostID = Posts + "/FetchDescTimestampOnPostID"
@@ -548,42 +726,266 @@ const Prior = ""
                 const CommentsIncrementLikes = Comments + "/IncrementLikes"
                 const CommentsDecrementLikes = Comments + "/DecrementLikes"
 
+                const CommentsDeleteOnID = Comments + "/DeleteOnID"
+
         /*
                 .get parameters: [Path: str]
-                .get return: [res.json: {ReactComponentsAttributes}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
         */
         app.get(CommentsFetchAll, (req, res) => {
-                db.query("SELECT * FROM Comments", (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                        else {
-                                return res.json(data)
-                        }
-                });
+                );
         });
 
 
         /*
                 .post parameters: [Path: str, {"CommentID": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .post return: [{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
         */
         app.post(CommentsFetchOnID, (req, res) => {
                 const comment_id = req.body.CommentID
-                db.query(`SELECT * FROM Comments WHERE CommentID = ${comment_id}`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.CommentID = ${comment_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                        else {
-                                return res.json(data)
+                );
+        });
+
+
+
+        /*
+                .get parameters: [Path: str, {"UserID": int}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.get(CommentsFetchOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.UserID = ${user_id}
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                });
+                );
+        });
+
+
+        /*
+                .get parameters: [Path: str, {"PostID": int}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.get(CommentsFetchOnPostID, (req, res) => {
+                const post_id = req.body.PostID
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.PostID = ${post_id}
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .get parameters: [Path: str, {"PostID": int}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.get(CommentsFetchAscLikesOnPostID, (req, res) => {
+                const post_id = req.body.PostID
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.PostID = ${post_id}
+                        ORDER BY Likes ASC
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .get parameters: [Path: str, {"PostID": int}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.get(CommentsFetchDescLikesOnPostID, (req, res) => {
+                const post_id = req.body.PostID
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.PostID = ${post_id}
+                        ORDER BY Likes DESC
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .get parameters: [Path: str, {"Username": str}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.get(CommentsFetchOnUsername, (req, res) => {
+                const username = req.body.Username
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.Username = ${username}
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .get parameters: [Path: str, {"PostID": str}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.get(CommentsFetchAscTimestampOnPostID, (req, res) => {
+                const post_id = req.body.post_id
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.PostID = ${post_id}
+                        ORDER BY A.Timestamp ASC
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .get parameters: [Path: str, {"PostID": str}]
+                .post return: ARRAY[{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.get(CommentsFetchDescTimestampOnPostID, (req, res) => {
+                const post_id = req.body.post_id
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.PostID = ${post_id}
+                        ORDER BY A.Timestamp DESC
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
         });
 
         
         /*
                 .post parameters: [Path: str, {"CommentID": int, "UserID": int, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .post return: [{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
         */
         app.post(CommentsInsertManual, (req, res) => {
                 const comment_id = req.body.CommentID
@@ -593,17 +995,6 @@ const Prior = ""
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
                 
-                var likes = 0
-                db.query(`
-                        INSERT INTO CommentLikes (UserID, CommentID, Likes)
-                        VALUES (
-                                ${user_id}, 
-                                ${comment_id}, 
-                                ${likes}
-                        )`,
-                        (err, data) => {}
-                );
-
                 db.query(`
                         INSERT INTO Comments (CommentID, UserID, Timestamp, PostID, Content, Anonymous, Username) 
                         VALUES (
@@ -621,6 +1012,17 @@ const Prior = ""
                                         return res.json(err)
                                 }
                         }
+                );
+
+                var likes = 0
+                db.query(`
+                        INSERT INTO CommentLikes (UserID, CommentID, Likes)
+                        VALUES (
+                                ${user_id}, 
+                                ${comment_id}, 
+                                ${likes}
+                        )`,
+                        (err, data) => {}
                 );
 
                 db.query(`
@@ -653,8 +1055,36 @@ const Prior = ""
 
 
         /*
+                .post parameters: [Path: str, {"CommentID": int}]
+                .post return: [{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
+        */
+        app.post(CommentsFetchOnID, (req, res) => {
+                const comment_id = req.body.CommentID
+                db.query(`
+                        SELECT 
+                        A.CommentID, A.UserID, A.Timestamp, 
+                        A.PostID, A.Content, A.Username, A.Anonymous,
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes
+                        FROM Comments A
+                        LEFT JOIN CommentLikes B ON A.CommentID = B.CommentID
+                        WHERE A.CommentID = ${comment_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
                 .post parameters: [Path: str, {"UserID": int, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .post return: [{{"CommentID": int, "UserID": int, "Timestamp": str, "PostID": int, "Content": str, "Anonymous": bool, "Username": str}]
         */
         app.post(CommentsInsertForward, (req, res) => {
 
@@ -664,18 +1094,6 @@ const Prior = ""
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
                 
-                var likes = 0
-                db.query(`
-                        INSERT INTO CommentLikes (UserID, CommentID, Likes)
-                        VALUES (
-                                ${user_id}, 
-                                (SELECT MAX(A.CommentID) + 1 FROM Comments A), 
-                                ${likes}
-                        )`,
-
-                        (err, data) => {}
-                );
-
                 db.query(`
                         INSERT INTO Comments (CommentID, UserID, Timestamp, PostID, Content, Anonymous, Username) 
                         VALUES (
@@ -693,6 +1111,17 @@ const Prior = ""
                                         return res.json(err)
                                 }
                         }
+                );
+
+                db.query(`
+                        INSERT INTO CommentLikes (UserID, CommentID, Likes)
+                        VALUES (
+                                ${user_id}, 
+                                (SELECT MAX(A.CommentID) + 1 FROM Comments A), 
+                                0
+                        )`,
+
+                        (err, data) => {}
                 );
 
                 db.query(`
@@ -715,36 +1144,111 @@ const Prior = ""
 
 
         /*
-                .post parameters: [Path: str, {"CommentID": int}]
-                .post return: [react.json: {int}]
+                .post parameters: [Path: str, {"UserID": int, "CommentID": int}]
+                .post return: [{"NumLikes": int}]
         */
         app.post(CommentsIncrementLikes, (req, res) => {
-                const value = req.body.number_likes
-                db.query(`UPDATE CommentLikes
-                        SET Likes = Likes + 1
-                        WHERE CommentId = ${value}`,
+                const user_id = req.body.UserID
+                const comment_id = req.body.CommentID
+                db.query(`
+                        INSERT CommentLikes (UserID, CommentID, Likes)
+                        VALUES (${user_id}, ${comment_id}, 1)
+                        `,
                 (err, data) => {
                         if (err) {
                                 return res.json(err)
                         }
                         else {
-                                return res.json(value + 1)
+                                db.query(`
+                                        SELECT COUNT(*) as NumLikes
+                                        WHERE CommentID = ${comment_id}
+                                        `,
+                                
+                                        (err, data) => {
+                                                if (err) {
+                                                        return res.json(err)
+                                                }
+                                                else {
+                                                        return res.json(data)
+                                                }
+                                        }
+                                );
                         }
                 });
         });
         app.post(CommentsDecrementLikes, (req, res) => {
-                const value = req.body.number_likes
-                db.query(`UPDATE CommentLikes
-                        SET Likes = Likes - 1 
-                        WHERE CommentId = ${value}`,
+                const user_id = req.body.UserID
+                const comment_id = req.body.CommentID
+                db.query(`
+                        DELETE FROM CommentLikes
+                        WHERE UserID = ${user_id} AND CommentID = ${comment_id}
+                        `,
                 (err, data) => {
                         if (err) {
                                 return res.json(err)
                         }
                         else {
-                                return res.json(value - 1)
+                                db.query(`
+                                        SELECT COUNT(*) as NumLikes
+                                        WHERE CommentID = ${comment_id}
+                                        AND Likes = 1
+                                        `,
+                                
+                                        (err, data) => {
+                                                if (err) {
+                                                        return res.json(err)
+                                                }
+                                                else {
+                                                        return res.json(data)
+                                                }
+                                        }
+                                );
                         }
                 });
+        });
+
+
+        /*
+
+        */
+        app.post(CommentsDeleteOnID, (req, res) => {
+                const comment_id = res.body.CommentID
+                db.query(`
+                        DELETE FROM Comments
+                        WHERE CommentID = ${comment_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
+                        }
+                );
+                db.query(`
+                        DELETE FROM CommentsLikes
+                        WHERE CommentID = ${comment_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
+                        }
+                );
+                db.query(`
+                        SELECT COUNT(*) = 0
+                        WHERE CommentID = ${comment_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                )
         });
 
 
@@ -756,26 +1260,31 @@ const Prior = ""
                 Options
         */
         const Users = Prior + "/Users"
-        const UsersFetchAll = Users + "/FetchAll"
-        const UsersFetchOnID = Users + "/FetchOnID"
+                const UsersFetchAll = Users + "/FetchAll"
+                const UsersFetchOnID = Users + "/FetchOnID"
 
-        const UsersInsertManual = Users + "/InsertManual"
-        const UsersInsertForward = Users + "/InsertFoward"
-        const UsersInsertBasic = Users + "/InsertBasic"
+                const UsersInsertManual = Users + "/InsertManual"
+                const UsersInsertForward = Users + "/InsertFoward"
+                const UsersInsertBasic = Users + "/InsertBasic"
 
-        const UsersGetUsername = Users + "/GetUsername"
-        const UsersGetPassword = Users + "/GetPassword"
-        const UsersGetBio = Users + "/GetBio"
-        const UsersGetEmail = Users + "/GetEmail"
+                const UsersCheckUsernameExists = Users + "/CheckUsernameExists"
+                const UsersCheckEmailExists = Users + "/CheckEmailExists"
 
-        const UsersChangeUsername = Users + "/ChangeUsername"
-        const UsersChangePassword = Users + "/ChangePassword"
-        const UsersChangeBio = Users + "/ChangeBio"
-        const UsersChangeEmail = Users + "/ChangeEmail"
+                const UsersGetUsername = Users + "/GetUsername"
+                const UsersGetPassword = Users + "/GetPassword"
+                const UsersGetBio = Users + "/GetBio"
+                const UsersGetEmail = Users + "/GetEmail"
+
+                const UsersChangeUsername = Users + "/ChangeUsername"
+                const UsersChangePassword = Users + "/ChangePassword"
+                const UsersChangeBio = Users + "/ChangeBio"
+                const UsersChangeEmail = Users + "/ChangeEmail"
+
+                const UsersDeleteAccount = Users + "/DeleteAccount"
 
         /*
                 .get parameters: [Path: str]
-                .get return: [res.json: {ReactComponentsAttributes}]
+                .post return: ARRAY[{"UserID": int "Username": str, "Password": str, "Bio": str, "Email": str}]
         */
         app.get(UsersFetchAll, (req, res) => {
                 db.query("SELECT * FROM Users", (err, data) => {
@@ -791,7 +1300,7 @@ const Prior = ""
 
         /*
                 .post parameters: [Path: str, {"UserID": int}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .post return: [{"UserID": int "Username": str, "Password": str, "Bio": str, "Email": str}]
         */
         app.post(UsersFetchOnID, (req, res) => {
                 const user_id = req.body.UserID
@@ -805,9 +1314,10 @@ const Prior = ""
                 });
         });
 
+
         /*
                 .post parameters: [Path: str, {"UserID": int, "Username": str, "Password": str, "Bio": str, "Email": str}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .post return: [{"UserID": int "Username": str, "Password": str, "Bio": str, "Email": str}]
         */
         app.post(UsersInsertManual, (req, res) => {
                 const user_id = req.body.UserID
@@ -851,23 +1361,13 @@ const Prior = ""
 
         /*
                 .post parameters: [Path: str, {"Username": str, "Password": str, "Bio": str, "Email": str}]
-                .post return: [res.json: {ReactComponentAttributes}]
+                .post return: [{"UserID": int "Username": str, "Password": str, "Bio": str, "Email": str}]
         */
         app.post(UsersInsertForward, (req, res) => {
                 const username = req.body.Username
                 const password = req.body.Password
                 const bio = req.body.Bio
                 const email = req.body.Email
-
-                var user_id = 0
-                db.query(`SELECT MAX(UserID) as Max FROM Users`, (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        }
-                        else {
-                                user_id = data[0].Max + 1
-                        }
-                });
 
                 db.query(`
                         INSERT INTO Users (UserID, Username, Password, Bio, Email)
@@ -886,7 +1386,7 @@ const Prior = ""
                                         db.query(`
                                                 SELECT * 
                                                 FROM Users 
-                                                WHERE UserID = (SELECT MAX(AUserID) FROM Users A)`,
+                                                WHERE UserID = (SELECT MAX(A.UserID) FROM Users A)`,
                                         (err, data) => {
                                                 if (err) {
                                                         return res.json(err)
@@ -903,7 +1403,7 @@ const Prior = ""
 
         /*
                 .post parameters: [Path: str, {"Username": str, "Password": str, "Email": str}]
-                .post return: [res.json: {""}]
+                .post return: [{"UserID": int "Username": str, "Password": str, "Bio": str, "Email": str}]
         */
         app.post(UsersInsertBasic, (req, res) => {
                 const username = req.body.Username
@@ -928,7 +1428,7 @@ const Prior = ""
                 db.query(`
                         SELECT *
                         FROM Users
-                        WHERE UserID = (SELECT MAX(A.UserID) + 1 FROM Users A
+                        WHERE UserID = (SELECT MAX(A.UserID) FROM Users A
                         )`,
                         
                         (err, data) => {
@@ -942,168 +1442,330 @@ const Prior = ""
                 )
         });
 
+        
+        /*
+                .post paramters: [Path: str, {"Username": str}]
+                .post return: [{"Existence": bool}]
+        */
+        app.post(UsersCheckUsernameExists, (req, res) => {
+                const username = req.body.Username
+                db.query(`
+                        SELECT COUNT(*) > 0 as Existence
+                        FROM Users
+                        WHERE Username = ${username}
+                        `,
+                
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .post paramters: [Path: str, {"Email": str}]
+                .post return: [{"Existence": bool}]
+        */
+        app.post(UsersCheckEmailExists, (req, res) => {
+                const email = req.body.Email
+                db.query(`
+                        SELECT COUNT(*) > 0 as Existence
+                        FROM Users
+                        WHERE Email = ${email}
+                        `,
+                
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
 
         /*
                 .post parameters: [Path: str, {"UserID": str}]
-                .post return: [res.json(): {"Username": str}]
+                .post return: [{"Username": str}]
         */
         app.post(UsersGetUsername, (req, res) => {
                 const user_id = req.body.UserID
-                db.query(`SELECT Username
+                db.query(`
+                        SELECT Username
                         FROM Users 
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        WHERE UserID = ${user_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                        else {
-                                return res.json(data)
-                        }
-                });
+                );
         });
 
 
         /*
                 .post parameters: [Path: str, {"UserID": str}]
-                .post return: [res.json(): {"Password": str}]
+                .post return: [{"Password": str}]
         */
         app.post(UsersGetPassword, (req, res) => {
                 const user_id = req.body.UserID
-                db.query(`SELECT Password
+                db.query(`
+                        SELECT Password
                         FROM Users 
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        WHERE UserID = ${user_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                        else {
-                                return res.json(data)
-                        }
-                });
+                );
         });
 
 
         /*
                 .post parameters: [Path: str, {"UserID": str}]
-                .post return: [res.json(): {"Bio": str}]
+                .post return: [{"Bio": str}]
         */
         app.post(UsersGetBio, (req, res) => {
                 const user_id = req.body.UserID
-                db.query(`SELECT Bio
+                db.query(`
+                        SELECT Bio
                         FROM Users 
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        WHERE UserID = ${user_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                        else {
-                                return res.json(data)
-                        }
-                });
+                );
         });
 
 
         /*
                 .post parameters: [Path: str, {"UserEmail": str}]
-                .post return: [res.json(): {"Email": str}]
+                .post return: [{"Email": str}]
         */
         app.post(UsersGetEmail, (req, res) => {
                 const user_id = req.body.UserEmail
-                db.query(`SELECT Email
+                db.query(`
+                        SELECT Email
                         FROM Users 
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        WHERE UserID = ${user_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                        else {
-                                return res.json(data)
-                        }
-                });
+                );
         });
 
 
         /*
                 .post parameters: [Path: str, {"UserID" : str, "Username" : str}]
-                .post return: [res.json: str]
+                .post return: [{"Username": str}]
         */
         app.post(UsersChangeUsername, (req, res) => {
                 const user_id = req.body.UserID
                 const username = req.body.Use
-                db.query(`UPDATE Users 
+                db.query(`
+                        UPDATE Users 
                         SET Username = ${username}
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
-                        } 
-                        else {
-                                return res.json(username)
+                        WHERE UserID = ${user_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } 
                         }
-                });
+                );
+                db.query(`
+                        SELECT Username
+                        FROM Users
+                        WHERE UserID = ${user_id}
+                        `,
+                
+                        (err, data) =>{
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                )
         });
 
 
         /*
                 .post parameters: [Path: str, {"UserID" : str, "Password" : str}]
-                .post return: [res.json: str]
+                .post return: [{"Password": str}]
         */
         app.post(UsersChangePassword, (req, res) => {
                 const user_id = req.body.UserID
                 const password = req.body.Password
-                db.query(`UPDATE Users 
+                db.query(`
+                        UPDATE Users 
                         SET Password = ${password}
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        WHERE UserID = ${user_id}
+                        `,
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
                         }
-                        else {
-                                return res.json(password)
+                );
+                db.query(`
+                        SELECT Password
+                        FROM Users
+                        WHERE UserID = ${user_id}
+                        `,
+                
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                });
+                )
         });
 
 
         /*
                 .post parameters: [Path: str, {"UserID": str, "Bio": str]
-                .post return: [return.json: str]
+                .post return: [{"Bio": str}]
         */
         app.post(UsersChangeBio, (req, res) => {
                 const user_id = req.body.UserID
                 const bio = req.body.Bio
-                db.query(`UPDATE Users 
+                db.query(`
+                        UPDATE Users 
                         SET Bio = ${bio}
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        WHERE UserID = ${user_id}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
                         }
-                        else {
-                                return res.json(bio)
+                );
+                db.query(`
+                        SELECT Bio
+                        FROM Users
+                        WHERE UserID = ${user_id}
+                        `,
+                
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                });
+                )
         });
 
 
         /*
                 .post parameters: [Path: str, {"user_id": str, "email": str}]
-                .post return: [return.json: str]
+                .post return: [{"Email": str}]
         */
         app.post(UsersChangeEmail, (req, res) => {
                 const user_id = req.body.UserID
                 const email = req.body.Email
-                db.query(`UPDATE Users 
+                db.query(`
+                        UPDATE Users 
                         SET Email = ${email}
-                        WHERE UserID = ${user_id}`,
-                (err, data) => {
-                        if (err) {
-                                return res.json(err)
+                        WHERE UserID = ${user_id}
+                        `,
+                
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
                         }
-                        else {
-                                return res.json(email)
+                );
+                db.query(`
+                        SELECT Email
+                        FROM Users
+                        WHERE UserID = ${user_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
                         }
-                });
+                )
+        });
+
+
+        /*
+                .post paramters: [Path: str, {"user_id": str}]
+                .post return: [{"Outcome": bool}]
+        */
+        app.post(UsersDeleteAccount, (req, res) => {
+                const user_id = req.body.UserID
+                db.query(`
+                        DELETE FROM Users
+                        WHERE UserID = ${user_id}
+                        `,
+                
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                );
+                db.query(`
+                        SELECT COUNT(*) = 0 as Outcome
+                        FROM Users
+                        WHERE UserID = ${user_id}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                )
         });
 
 

@@ -5,23 +5,41 @@ Example 1:
         Say we are given the function:
 
                 /*
-                        .get parameters: [path: str, {"PostID": int}]
-                        .get return: [res.json: {"PostLikes": int}]
+                        .post parameters: [path: str, {"UserID": int, "PostID": int}]
+                        .post return: [{"NumLikes": int}]
                 */
                 app.post(PostsIncrementLikes, (req, res) => {
-                        const value = req.body.PostID
-                        db.query(`UPDATE PostLikes
-                                        SET Likes = Likes + 1 
-                                        FROM Posts
-                                        WHERE PostID = ${value}`,
-                        (err, data) => {
-                                if (err) {
-                                        return res.json(err)
+                        const user_id = req.body.UserID
+                        const post_id = req.body.PostID
+                        db.query(` 
+                                INSERT PostLikes (UserID, PostID, Likes)
+                                VALUES (${user_id}, ${post_id}, 1)
+                                `,
+
+                                (err, data) => {
+                                        if (err) {
+                                                return res.json(err)
+                                        }
+                                        else {
+                                                db.query(`
+                                                        SELECT COUNT(*) as NumLikes
+                                                        FROM PostLikes
+                                                        WHERE PostID = ${post_id}
+                                                        `,
+                                                        
+                                                        (err, data) => {
+                                                                if (err) {
+                                                                        return res.json
+                                                                }
+                                                                else {
+                                                                        return res.json(data)
+                                                                }
+                                                        }
+                                                
+                                                );
+                                        }
                                 }
-                                else {
-                                        return res.json(value + 1)
-                                }
-                        });
+                        );
                 });
 
 
@@ -29,14 +47,14 @@ Example 1:
 
                 import axios from 'axios';
 
-                axios.post("http://localhost:3307/Posts/IncrementLikes, {"PostID" = 3})
+                axios.post("http://localhost:3307/Posts/IncrementLikes, {"UserID": 3, "PostID": 3})
 
         or if you import src/app/paths:
 
                 import axios from 'axios';
                 import {PostsIncrementLikes} from "@/app/paths"
 
-                axios.post(PostsIncrementLikes, {"PostID" = 3})
+                axios.post(PostsIncrementLikes, {"UserID": 3, "PostID": 3})
 
         or if you are using a react component variable:
 
@@ -44,9 +62,10 @@ Example 1:
                 import {PostsIncrementLikes} from "@/app/paths"
 
                 const [post_id, setPost] = useState(3)
+                const [user_id, setUserID] = useState(3)
                 const [post_content, setID] = useState("Hi there!)
                 
-                axios.post(PostsIncrementLikes, {"PostID": post_id})
+                axios.post(PostsIncrementLikes, {"UserID": user_id, "PostID": post_id})
 
 
 
@@ -54,7 +73,7 @@ Example 1:
 
                 import axios from 'axios';
                 import {PostsIncrementLikes} from "@/app/paths"
-                var res = axios.post(PostsIncrementLikes, {"PostID" = 3})
+                var res = axios.post(PostsIncrementLikes,  {"UserID": 3, "PostID": 3})
 
                 console.log(res)
 
@@ -62,9 +81,9 @@ Example 1:
 
                 console.log(res.data)
                         
-                        The output of this would be {"PostLikes": 4}
+                        The output of this would be {"NumLikes": 4}
 
-                console.log(res.data.PostLikes)
+                console.log(res.data.NumLikes)
 
                         The output of this log would be: 4
 
