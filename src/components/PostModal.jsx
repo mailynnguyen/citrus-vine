@@ -34,24 +34,31 @@ const PostModal = () => {
     console.log(post)
 
     return (
-        <div id="outer-box">
+        <div class="outer-box">
             
-            <button>
+            {/*<button>
                 <X color="#E1AB69" size={48} id="x" />
-            </button>
+            </button>*/}
 
-            <textarea 
-                onChange={handleChange} 
-                type="text" 
-                id="text" 
-                name="body" 
-                placeholder="Type here..." 
-            />
-
-            <div id="buttons">
-                <Button title="Anonymous ON" />
-                <Button title="Post" onClick={handleClick}/>
+            <div class="inner-content-holder">
+                <textarea 
+                    onChange={handleChange} 
+                    type="text" 
+                    class="text-box" 
+                    name="body" 
+                    placeholder="Type here..." 
+                />
+                
+                <div class="create-post-buttons">
+                    <Button title="Anonymous ON" />
+                    <Button title="Post" onClick={handleClick}/>
+                </div>
             </div>
+            
+
+            <button id="x" >
+                <X color="#E1AB69" size={48}/>
+            </button>
             
         </div>
     )
