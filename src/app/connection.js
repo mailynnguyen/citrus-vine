@@ -81,6 +81,7 @@ const Prior = ""
         */
         const Posts = Prior + "/Posts"
                 const PostsFetchAll = Posts + "/FetchAll"
+                const PostsFetch10 = Posts + "/Fetch10"
                 const PostsFetchAscLikes = Posts + "/FetchAscLikes"
                 const PostsFetchDescLikes = Posts + "/FetchDescLikes"
                 const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
@@ -116,6 +117,34 @@ const Prior = ""
                         FROM Posts A
                         LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
                         LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        `, 
+                        
+                (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                });
+        });
+
+        /*
+                .get parameters: [path: str] 
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.get(PostsFetch10, (req, res) => {
+
+                const offset = (req.query.page - 1) * 10
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        ORDER BY A.Timestamp DESC
+                        LIMIT 10 OFFSET ${offset}
                         `, 
                         
                 (err, data) => {
