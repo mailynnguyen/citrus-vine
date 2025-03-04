@@ -15,8 +15,8 @@ const SearchBar = () => {
                 <button className='search-button'>
                     <AiOutlineSearch className='search-icon'/>
                 </button>
-                <div className='search-results'>
-                </div>
+                {/* <div className='search-results'> */}
+                {/* </div> */}
             </div>
         </form>
     )
