@@ -8,10 +8,10 @@ import "@/styles/post_modal.css";
 
 const PostModal = ({ onClick, setCreate }) => {
 
+    const [anonymous, setAnonymous] = useState(false)
     const [post, setPost] = useState({
         UserID: 1,
         Content: "",
-        // date_time: "",
         Anonymous: false,
         Username: "mailyn"
     })
@@ -24,10 +24,6 @@ const PostModal = ({ onClick, setCreate }) => {
 
     const handleClick = async (e) => {
         e.preventDefault()
-
-        // const currDate = new Date()
-        // const formattedDate = currDate.toISOString().slice(0, 19).replace('T', ' ')
-        // const finalPost = {...post, date_time: formattedDate}
 
         try { 
             const res = await axios.post("http://localhost:3307/Posts/InsertForward", post)
@@ -65,7 +61,7 @@ const PostModal = ({ onClick, setCreate }) => {
                 />
 
                 <div id="post-modal-buttons">
-                    <Button title="Anonymous ON" />
+                    <Button title="Anonymous ON" onClick={() => setAnonymous(!anonymous)} />
                     <Button title="Post" onClick={handleClick}/>
                 </div>
                 
