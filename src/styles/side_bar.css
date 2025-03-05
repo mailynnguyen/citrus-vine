@@ -1,0 +1,48 @@
+#section {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 20%;
+    padding: 2%;
+    height: 100vh;
+}
+
+#top {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#profile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6%;
+    padding-left: 6%;
+}
+
+#display-name {
+    font-weight: 400;
+    font-size: 1.4rem;
+}
+
+#log-out {
+    position: absolute;
+    right: 6%;
+}
+
+#side-bar-buttons {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8%;
+    gap: 15px;
+    flex-grow: 0;
+}
+
+#divisor {
+    background-color: lightgrey;
+    height: 6px;
+    border-radius: 5px;
+    margin-top: 8%;
+}
