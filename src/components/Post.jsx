@@ -15,19 +15,19 @@ const Post = ({ body, date_time, display_name }) => {
 
             <div id="profile-pic"></div>
 
-            <div id="right-section">
+            <div className="right-section">
 
                 <div id="title">
                     <div id="display-name">{display_name}</div>
-                    <div id="time-stamp">{date_time}</div>
+                    <div className="time-stamp">{date_time}</div>
                 </div>
 
-                <p id ="content">
+                <p className ="post-content">
                     {body}
                 </p>
 
-                <div id="buttons">
-                    <div id="like-button">
+                <div className="post-button-holder">
+                    <div className="post-like-button">
                             {like
                                 ? <Heart className="heart" id="heart-filled" onClick={() => setLike(!like)} fill="#BE4A31" strokeWidth={0} />
                                 : <Heart className="heart" id="heart-outline" onClick={() => setLike(!like)} strokeWidth={1.3} color="#878787" />
@@ -35,7 +35,7 @@ const Post = ({ body, date_time, display_name }) => {
                             <p id="like-count">0</p>
                     </div>
 
-                    <div id="comment-button">
+                    <div className="post-comment-button">
                         <MessageCircle className="comment-button" />
                         <p id="comment-count">0</p>
                     </div>

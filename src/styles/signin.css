@@ -1,29 +1,31 @@
 @import url("https://fonts.googleapis.com/css?family=Indie Flower");
 
-body {
+#bg-holder {
     background-color: #7CA7E1;
-    background-image: url("https://images.pexels.com/photos/3804878/pexels-photo-3804878.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
-    background-size: cover;
+    background-image: url("../images/citrus-bg.jpeg");
+    /*background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
     background-blend-mode: multiply;
+    min-height: "100vh";*/
 }
 
 .sign-in-text {
     display: block;
-    font-size: 6rem;
+    font-size: 5rem;
     font-family: 'Indie Flower';
     text-align: center;
-    margin-top: 6%;
+    margin-top: 1%;
     color: white;
     pointer-events: none;
     user-select: none;
+    padding: .5em 0 0 0;
 }
 
 .sign-in-form, #alt-sign-in {
     display: flex;
     flex-direction: column;
-    width: max(25%, 350px);
+    width: max(30%, 350px);
     margin: 0 auto;
     padding: 3%;
 }
@@ -35,6 +37,7 @@ body {
     margin: 5% 0;
     padding: 6%;
     font-size: 1.1rem;
+    font-weight: 600;
 }
 
 input[type=submit]:hover {
@@ -63,8 +66,10 @@ input:focus::-ms-input-placeholder {
     background-color: #D9D9D9;
     color: #202020;
     margin: 3% auto;
-    border-radius: 1rem;
-    width: 70%;
-    padding: 1%;
-    font-size: .9rem;
+    padding: .25rem;
+    border-radius: 1em;
+    width: 60%;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-sizing: border-box;
 }

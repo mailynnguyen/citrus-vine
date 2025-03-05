@@ -47,24 +47,26 @@ const PostModal = ({ onClick, setCreate }) => {
             <div id="overlay" />
             
             <div id="outer-box">
-                
-                <button onClick={onClick}>
-                    <X color="#E1AB69" size={48} id="x" />
-                </button>
 
-                <textarea 
-                    onChange={handleChange} 
-                    type="text" 
-                    id="text" 
-                    name="Content" 
-                    placeholder="Type here..." 
-                />
+                <div className="inner-content-holder">
+                    <textarea 
+                        onChange={handleChange} 
+                        type="text" 
+                        id="text" 
+                        name="Content" 
+                        placeholder="Type here..." 
+                    />
 
-                <div id="post-modal-buttons">
-                    <Button title="Anonymous ON" onClick={() => setAnonymous(!anonymous)} />
-                    <Button title="Post" onClick={handleClick}/>
+                    <div id="post-modal-buttons">
+                        <Button title="Anonymous ON" onClick={() => setAnonymous(!anonymous)} />
+                        <Button title="Post" onClick={handleClick}/>
+                    </div>
+
                 </div>
-                
+
+                <button onClick={onClick} id="x">
+                    <X color="#E1AB69" size={48}/>
+                </button>
             </div>
         </div>
         
