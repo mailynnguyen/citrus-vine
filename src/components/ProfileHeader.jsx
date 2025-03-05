@@ -3,18 +3,18 @@ import "@/styles/profile_header.css";
 
 const ProfileHeader = () => {
     return (
-        <div class="profile-header">
+        <div className="profile-header">
 
             {/* Temp Profile Pic*/}
-            <div class="profile-pic"></div>
+            <div className="profile-pic"></div>
 
-            <div class="display-bio-holder">
-                <p class="display-name">IEatDogFood</p>
-                <p class="header-bio">I am dog. I eat dog food and occasionally my owner’s food. My owner loves me very much. I am a good doggo.</p>
+            <div className="display-bio-holder">
+                <p className="display-name">IEatDogFood</p>
+                <p className="header-bio">I am dog. I eat dog food and occasionally my owner’s food. My owner loves me very much. I am a good doggo.</p>
             </div>
             
 
-            <div class="profile-button-holder">
+            <div className="profile-button-holder">
                 <Button title="Follow" />
                 <Button title="Message" />
                 <Button title="Report" />

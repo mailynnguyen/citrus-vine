@@ -28,9 +28,9 @@ const InputField = ({fieldName, fieldPlaceHolder, fieldWidth}) => {
     setFieldValue(event.target.value)
   }
   return (
-    <div class="input-field" style={{width:`${fieldWidth}`}}>
+    <div className="input-field" style={{width:`${fieldWidth}`}}>
       <div className="sign-up-text">{fieldName}</div>
-      <input value={fieldValue} placeholder={fieldPlaceHolder} type="text" onChange={onFieldValueChange} class= "sign-up-input" /*style={{width:`${fieldWidth}`, height:"30px", borderRadius:"10px", paddingLeft:"10px"}}*/ />  
+      <input value={fieldValue} placeholder={fieldPlaceHolder} type="text" onChange={onFieldValueChange} className= "sign-up-input" /*style={{width:`${fieldWidth}`, height:"30px", borderRadius:"10px", paddingLeft:"10px"}}*/ />  
     </div>
   )
 }
@@ -59,8 +59,8 @@ const SignUp = () => {
     <body id="sign-up-background" style ={{backgroundImage: `url(${PusheenImage.src})`}}>
 
         
-        <div class="sign-up-title">Sign Up</div><br></br>
-        <img src={CitrusVineLogo.src} class="sign-up-citrus-vine-logo"></img>
+        <div className="sign-up-title">Sign Up</div><br></br>
+        <img src={CitrusVineLogo.src} className="sign-up-citrus-vine-logo"></img>
         
         
         

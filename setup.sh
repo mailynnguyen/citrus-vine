@@ -4,6 +4,7 @@
         npm i react
         npm i react-dom
         npm i next
+        npm i react-icons
 
         # Launch
                 # npm run dev

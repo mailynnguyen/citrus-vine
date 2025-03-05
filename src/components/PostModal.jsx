@@ -48,7 +48,7 @@ const PostModal = ({ onClick, setCreate }) => {
             
             <div id="outer-box">
 
-                <div class="inner-content-holder">
+                <div className="inner-content-holder">
                     <textarea 
                         onChange={handleChange} 
                         type="text" 

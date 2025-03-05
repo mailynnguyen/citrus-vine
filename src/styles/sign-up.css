@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css?family=Indie Flower");
 
 .sign-up-title {
   display: block;
@@ -28,9 +29,9 @@
 #sign-up-background {
   /*background-image: url(../images/pusheen-background-upscaled.png);*/
   background-color: #7CA7E1;
-  background-size: cover;
+  /*background-size: cover;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: center center;*/
   /*min-height: "100vh";*/
 }
 
