@@ -6,21 +6,28 @@ import axios from 'axios';
 
 import "@/styles/post_modal.css";
 
-const PostModal = () => {
+const PostModal = ({ onClick, setCreate }) => {
 
+    const [anonymous, setAnonymous] = useState(false)
     const [post, setPost] = useState({
-        body: "",
+        UserID: 1,
+        Content: "",
+        Anonymous: false,
+        Username: "mailyn"
     })
 
     const handleChange = (e) => {
+        
         setPost(prev => ({ ...prev, [e.target.name]: e.target.value }))
         // setPost({ body: e.target.value, author: "" })
     }
 
     const handleClick = async (e) => {
         e.preventDefault()
+
         try { 
-            const res = await axios.post("http://localhost:8800/posts", post)
+            const res = await axios.post("http://localhost:3307/Posts/InsertForward", post)
+            console.log("hello")
             console.log("post created: ", res.data)
         } catch (err) {
             console.log(err)
@@ -28,39 +35,39 @@ const PostModal = () => {
                 console.log(err.res, "error res")
             }
         }
+        setCreate(false)
+        document.body.style.overflow = "auto"; // Disable scrolling when modal is open
     }
 
 
     console.log(post)
 
     return (
-        <div class="outer-box">
+        <div>
+            <div id="overlay" />
             
-            {/*<button>
-                <X color="#E1AB69" size={48} id="x" />
-            </button>*/}
+            <div id="outer-box">
+                
+                <button onClick={onClick}>
+                    <X color="#E1AB69" size={48} id="x" />
+                </button>
 
-            <div class="inner-content-holder">
                 <textarea 
                     onChange={handleChange} 
                     type="text" 
-                    class="text-box" 
-                    name="body" 
+                    id="text" 
+                    name="Content" 
                     placeholder="Type here..." 
                 />
-                
-                <div class="create-post-buttons">
-                    <Button title="Anonymous ON" />
+
+                <div id="post-modal-buttons">
+                    <Button title="Anonymous ON" onClick={() => setAnonymous(!anonymous)} />
                     <Button title="Post" onClick={handleClick}/>
                 </div>
+                
             </div>
-            
-
-            <button id="x" >
-                <X color="#E1AB69" size={48}/>
-            </button>
-            
         </div>
+        
     )
 }
 

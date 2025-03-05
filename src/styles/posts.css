@@ -1,0 +1,13 @@
+#posts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#posts-load-more-btn {
+    width: 80%; /* side-bar is width: 20% */
+    padding-top: 5%;
+    padding-bottom: 5%;
+    display: flex;
+    justify-content: center;
+}

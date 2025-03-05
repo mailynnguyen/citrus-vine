@@ -36,12 +36,10 @@ app.get("/posts", (req, res) => {
 
 // POST route to insert a new post into the database
 app.post("/posts", (req, res) => {
-
-
-  // You should validate the input to prevent SQL injection, but here’s a simple example
-  const q = "INSERT INTO posts (`body`) VALUES (?)";
+  const q = "INSERT INTO posts (`body`, `date_time`) VALUES (?, ?)";
   const values = [
     req.body.body,
+    req.body.date_time
   ]
   db.query(q, values, (err, data) => {
     if (err) return res.json(err);

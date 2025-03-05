@@ -1,0 +1,104 @@
+------------------------- Express Tutorial -------------------------
+
+Example 1:
+
+        Say we are given the function:
+
+                /*
+                        .post parameters: [path: str, {"UserID": int, "PostID": int}]
+                        .post return: [{"NumLikes": int}]
+                */
+                app.post(PostsIncrementLikes, (req, res) => {
+                        const user_id = req.body.UserID
+                        const post_id = req.body.PostID
+                        db.query(` 
+                                INSERT PostLikes (UserID, PostID, Likes)
+                                VALUES (${user_id}, ${post_id}, 1)
+                                `,
+
+                                (err, data) => {
+                                        if (err) {
+                                                return res.json(err)
+                                        }
+                                        else {
+                                                db.query(`
+                                                        SELECT COUNT(*) as NumLikes
+                                                        FROM PostLikes
+                                                        WHERE PostID = ${post_id}
+                                                        `,
+                                                        
+                                                        (err, data) => {
+                                                                if (err) {
+                                                                        return res.json
+                                                                }
+                                                                else {
+                                                                        return res.json(data)
+                                                                }
+                                                        }
+                                                
+                                                );
+                                        }
+                                }
+                        );
+                });
+
+
+        To call this function:
+
+                import axios from 'axios';
+
+                axios.post("http://localhost:3307/Posts/IncrementLikes, {"UserID": 3, "PostID": 3})
+
+        or if you import src/app/paths:
+
+                import axios from 'axios';
+                import {PostsIncrementLikes} from "@/app/paths"
+
+                axios.post(PostsIncrementLikes, {"UserID": 3, "PostID": 3})
+
+        or if you are using a react component variable:
+
+                import axios from 'axios';
+                import {PostsIncrementLikes} from "@/app/paths"
+
+                const [post_id, setPost] = useState(3)
+                const [user_id, setUserID] = useState(3)
+                const [post_content, setID] = useState("Hi there!)
+                
+                axios.post(PostsIncrementLikes, {"UserID": user_id, "PostID": post_id})
+
+
+
+        The output of this function assuming the post had 4 likes:
+
+                import axios from 'axios';
+                import {PostsIncrementLikes} from "@/app/paths"
+                var res = axios.post(PostsIncrementLikes,  {"UserID": 3, "PostID": 3})
+
+                console.log(res)
+
+                        This would output a json object with a bunch of unneeded attributes. Don't do this.
+
+                console.log(res.data)
+                        
+                        The output of this would be {"NumLikes": 4}
+
+                console.log(res.data.NumLikes)
+
+                        The output of this log would be: 4
+
+                        Always do .data and then specify the return type's key to retrieve the json 
+                        file data. In this case, the return type has a key. If the return type doesn't
+                        have a key, then you can simply do "res.data".
+                        
+                        So bascially, if the json file return type has key-value pairs, then you would 
+                        need to do:
+
+                                res.data.[attribute_here]         # Not including the brackets
+
+                        otherwise doing:
+
+                                res.data
+                        
+                        is satisfactory.
+
