@@ -12,12 +12,21 @@ const PostModal = ({ onClick, setCreate }) => {
     const [post, setPost] = useState({
         UserID: 1,
         Content: "",
-        Anonymous: false,
+        Anonymous: anonymous,
         Username: "mailyn"
     })
 
+    const handleAnon = (e) => {
+        e.preventDefault()
+
+        // Update anonymous state and use the updated state to set the post
+        setAnonymous(prev => {
+            setPost(prevPost => ({ ...prevPost, Anonymous: !prev }));
+            return !prev;  // Return the new value for anonymous
+        });
+    }
+
     const handleChange = (e) => {
-        
         setPost(prev => ({ ...prev, [e.target.name]: e.target.value }))
         // setPost({ body: e.target.value, author: "" })
     }
@@ -58,7 +67,13 @@ const PostModal = ({ onClick, setCreate }) => {
                     />
 
                     <div id="post-modal-buttons">
-                        <Button title="Anonymous ON" onClick={() => setAnonymous(!anonymous)} />
+                        {
+                            anonymous
+                            ? <Button title="Anonymous OFF" onClick={handleAnon} />
+                            : <Button title="Anonymous ON" onClick={handleAnon} />
+
+                        }
+                        
                         <Button title="Post" onClick={handleClick}/>
                     </div>
 
