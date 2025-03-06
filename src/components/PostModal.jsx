@@ -21,7 +21,10 @@ const PostModal = ({ onClick, setCreate }) => {
 
         // Update anonymous state and use the updated state to set the post
         setAnonymous(prev => {
-            setPost(prevPost => ({ ...prevPost, Anonymous: !prev }));
+            if (!prev === true) 
+                setPost(prevPost => ({ ...prevPost, Anonymous: !prev, Username: "Anonymous" }))
+            else 
+                setPost(prevPost => ({ ...prevPost, Anonymous: !prev }));
             return !prev;  // Return the new value for anonymous
         });
     }
@@ -44,6 +47,7 @@ const PostModal = ({ onClick, setCreate }) => {
                 console.log(err.res, "error res")
             }
         }
+
         setCreate(false)
         document.body.style.overflow = "auto"; // Disable scrolling when modal is open
     }
