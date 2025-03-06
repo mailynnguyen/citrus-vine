@@ -6,8 +6,6 @@ import Posts from "@/components/Posts";
 import SearchBar from "@/components/SearchBar";
 import SideBar from "@/components/SideBar";
 
-import SignIn from "@/components/SignIn";
-
 export default function Home() {
 
   const [create, setCreate] = useState(false);
@@ -27,7 +25,14 @@ export default function Home() {
 
   return (
     <div>
-      <SignIn ></SignIn>
+      <div>
+        <SearchBar />
+        <Posts />
+      </div>
+      
+      <SideBar onClick={handleOpen}/>
+
+      {create ? <PostModal onClick={handleClose} setCreate={setCreate} /> : ""}
     </div>
   );
 }
