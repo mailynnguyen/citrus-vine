@@ -12,6 +12,7 @@ const Posts = Prior + "/Posts"
         export const PostsFetchOnUsername = Posts + "/FetchOnUsername"
         export const PostsFetchAscTimestampOnUserID = Posts + "/FetchOnAscTimestampOnUserID"
         export const PostsFetchDescTimestampOnUserID = Posts + "/FetchOnDescTimestampOnUserID"
+        export const PostsFetch10AscTimestamp = Posts + "/Fetch10AscTimestamp"
         export const PostsFetchAscLikesOnUserID = Posts + "/FetchOnAscLikesOnUserID"
         export const PostsFetchDescLikesOnUserID = Posts + "/FetchOnDescLikesOnUserID"
 
@@ -61,9 +62,12 @@ const Users = Prior + "/Users"
         export const UsersGetBio = Users + "/GetBio"
         export const UsersGetEmail = Users + "/GetEmail"
 
+        export const UsersGetUserIDOnUsername = Users + "/GetUserIDOnUsername"
+
         export const UsersChangeUsername = Users + "/ChangeUsername"
         export const UsersChangePassword = Users + "/ChangePassword"
         export const UsersChangeBio = Users + "/ChangeBio"
         export const UsersChangeEmail = Users + "/ChangeEmail"
 
+        export const UsersValidateAccount = Users + "/ValidateAccount"
         export const UsersDeleteAccount = Users + "/DeleteAccount"
