@@ -4,7 +4,7 @@ const mysql = require("mysql2")
 const cors = require("cors");
 // const promise = require("mysql2/promise")
 const { M_PLUS_1 } = require("next/font/google");
-const { DatabaseBackup } = require("lucide-react");
+// const { DatabaseBackup } = require("lucide-react");
 
 const app = express()
 app.use(cors());
@@ -40,7 +40,14 @@ app.listen(3307, () => {
   console.log(`App connected to db! Please visit http://localhost:3307/ to see returns.`)
 })
       
-
+app.get("/", (req, res) => {
+        res.send("Connection.js is functional.")
+})
+/*
+        Routers
+*/
+const userQueryRouter = require('./query-routes/users')
+app.use('/UsersQuery', userQueryRouter)
 
 /*
         NOTES:
@@ -1530,6 +1537,7 @@ const Prior = ""
                         }
                 );
         });
+
 
 
         /*
