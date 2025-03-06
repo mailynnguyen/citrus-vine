@@ -4,6 +4,7 @@ const mysql = require("mysql2")
 const cors = require("cors");
 // const promise = require("mysql2/promise")
 const { M_PLUS_1 } = require("next/font/google");
+const { DatabaseBackup } = require("lucide-react");
 
 const app = express()
 app.use(cors());
@@ -85,6 +86,7 @@ const Prior = ""
                 const PostsFetchAscLikes = Posts + "/FetchAscLikes"
                 const PostsFetchDescLikes = Posts + "/FetchDescLikes"
                 const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
+                const PostsFetch10AscTimestamp = Posts + "/Fetch10AscTimestamp"
                 const PostsFetchDescTimestamp = Posts + "/FetchOnDescTimestamp"
 
                 const PostsFetchOnPostID = Posts + "/FetchOnPostID"
@@ -250,6 +252,36 @@ const Prior = ""
                         LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
                         LEFT JOIN PostLikes B ON A.PostID = B.PostID
                         ORDER BY A.Timestamp DESC
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+
+        /*
+                .get parameters: [Path: str]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.get(PostsFetch10AscTimestamp, (req, res) => {
+                const offset = (req.query.page - 1) * 10
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        ORDER BY A.Timestamp ASC
+                        LIMIT 10 OFFSET ${offset}
                         `, 
                         
                         (err, data) => {
@@ -1305,11 +1337,14 @@ const Prior = ""
                 const UsersGetBio = Users + "/GetBio"
                 const UsersGetEmail = Users + "/GetEmail"
 
+                const UsersGetUserIDOnUsername = Users + "/GetUserIDOnUsername"
+
                 const UsersChangeUsername = Users + "/ChangeUsername"
                 const UsersChangePassword = Users + "/ChangePassword"
                 const UsersChangeBio = Users + "/ChangeBio"
                 const UsersChangeEmail = Users + "/ChangeEmail"
 
+                const UsersValidateAccount = Users + "/ValidateAccount"
                 const UsersDeleteAccount = Users + "/DeleteAccount"
 
         /*
@@ -1618,6 +1653,30 @@ const Prior = ""
 
 
         /*
+                .post parameters: [Path: str, {"Username": str}]
+                .post return: [{"Email": str}]
+        */
+        app.post(UsersGetUserIDOnUsername, (req, res) => {
+                const username = req.body.Username
+                db.query(`
+                        SELECT UserID
+                        FROM Users 
+                        WHERE Username = ${username} 
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+        
+
+        /*
                 .post parameters: [Path: str, {"UserID" : str, "Username" : str}]
                 .post return: [{"Username": str}]
         */
@@ -1763,6 +1822,32 @@ const Prior = ""
                 )
         });
 
+
+        /*
+                .post parameters: [Path: str, {"Username": str, "Password": str}]
+                .post return: [{"Outcome": bool}]
+        */
+        app.post(UsersValidateAccount, (req, res) => {
+                const username = req.body.Username
+                const password = req.body.Password
+                db.query(`
+                        SELECT COUNT(*) = 1 as Outcome
+                        FROM Users
+                        WHERE 
+                                Username = ${username}
+                                AND Password = ${password}
+                        `,
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                )
+        });
 
         /*
                 .post paramters: [Path: str, {"user_id": str}]
