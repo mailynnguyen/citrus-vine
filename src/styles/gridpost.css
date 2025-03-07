@@ -1,117 +1,115 @@
 .gridpost {
     display: flex;
-    /*flex-direction: column; */
-    /*justify-content: space-between;*/
-    width: max(28vw, 300px);  
-    min-height: 300px;
-    aspect-ratio: 1/1;
+    flex-direction: column; 
     justify-content: space-between;
-    align-items: flex-start;
-    
-    padding: 1rem; 
-    /*gap: 0.5rem; */
-    /*overflow: hidden; */
-    flex-basis: max(28vw, 300px);  
-}
-
-.gridpost-side-decor {
-    height: 100%;
-    width: 5%;
-    flex: none;
-    display: block;
-}
-
-.gridpost-left-decor {
-    background-color: #7CA7E1;
-}
-
-.gridpost-right-decor {
-    background-color: #E1AB69;
-}
-
-.gridpost-interior {
-    display: flex;
-    flex-direction: column;
-    /*flex-wrap: wrap;*/
-    justify-content: flex-start;
-    flex-grow: 2;
-    padding: .5rem;
-    /*align-items: center;*/
-    height: 100%;
-
-    overflow: hidden;
-    flex-shrink: 2;
-}
-
-.gridpost-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: inherit;
-    overflow: scroll;
+    width: 30vmax;  
+    height: 30vmax; 
+    margin: 1vmax;
+    padding: 2vmax; 
+    gap: 10%;
+    /*overflow: hidden;*/ 
+    border-left: 1.2vmax solid orange;
+    border-right: 1.2vmax solid lightskyblue;
 }
 
 .gridpost-info-holder {
     display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+
+    /*flex-flow: column;*/
+    height: 3.5rem; /*same as pfp height*/
+    /*justify-content: center;
+    align-items: flex-start;*/
+    /*flex-wrap: wrap;*/
+    font-size: 1.4rem;
+    font-weight: 600;
+    gap: 2vmax;
+
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* this is not used anywhere
+
+.gridpost-title {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 1rem;
-    font-weight: 700;
+
     width: 100%;
+}*/
+
+.gridpost-name {
     font-size: 1.4rem;
-    padding-right: .5rem;
+    font-weight: bold;
+    flex-shrink: 2;
+    flex-grow: 0;
+
+    width: 100%;
+    overflow: scroll;
 }
 
 /* Profile picture styling */
 .gridpost-profile-pic {
-    width: 3.5rem;
-    height: 3.5rem;
+
+
     background-color: lightgray;
     border-radius: 50%;
     flex-shrink: 0; /* Prevents resizing */
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+     
 }
 
 .gridpost-time-stamp {
     display: flex;
     flex-direction: column;
-    text-align: right;
+    text-align: left;
     color: #878787;
-    font-size: .8rem;
+    font-size: .9rem;
     font-weight: 400;
-}
-
-/* Content remains above the buttons */
-.gridpost-content {
-    display: block;
-    font-weight: 500;
-    padding: 2rem 2rem 0 2rem;
-    /*overflow: hidden;*/
-    text-overflow: ellipsis;
-    /*flex-grow: 1;*/ /* ✅ Makes content take up available space */
-    width: 100%;
-    font-size: 1.1rem;
-}
-
-/* ✅ Ensure buttons are placed at the bottom */
-.gridpost-button-holder {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: auto; 
-    padding-top: 1rem; 
-    padding-left: 2rem;
 
     /*align-self: flex-end;*/
-    width: 100%;
+}
+
+
+.gridpost-content {
+    font-weight: 400;
+    font-size: 1.2rem;
+    padding-left: 1.75rem; /*half profile-pic width*/
+    overflow: scroll;
+    text-overflow: ellipsis;
+    flex-grow: 1; 
+    text-align: left;
+}
+
+.buttons-gridpost{
+    display: inline-flex;
+    /*align-items: left;*/
+    flex-direction: row;
+    gap: 10%;
+    margin-top: auto; 
+    padding-top: 1vmin; 
+
+    justify-content: flex-start;
+    overflow: hidden;
+    flex-shrink: 0;
 }
 
 /* Styling for buttons */
-.gridpost-like-button, .gridpost-comment-button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.like-button, .comment-button {
+    display: inline-flex;
+    align-items: start;
+    gap: .5rem;
     font-weight: 500;
     color: #858585;
     cursor: pointer;
+    /*padding-inline: 1.5rem;*/
+
+    font-size: 1.1rem;
 }
 
 .heart:hover, .comment-button:hover {
