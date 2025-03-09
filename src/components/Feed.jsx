@@ -11,6 +11,11 @@ import PostModal from "./PostModal"
 const Feed = () => {
 
     const [create, setCreate] = useState(false);
+    const [collectedText, setCollectedText] = useState("")
+
+    useEffect(() => {
+
+    }, [collectedText])
   
     const handleOpen = (e) => {
       e.preventDefault();
@@ -28,8 +33,8 @@ const Feed = () => {
     return (
       <div>
         <div>
-          <SearchBar />
-          <Posts />
+          <SearchBar sendText = {setCollectedText}/>
+          <Posts collectedText={collectedText}/>
         </div>
         
         <SideBar onClick={handleOpen}/>
