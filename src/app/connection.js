@@ -4,7 +4,7 @@ const mysql = require("mysql2")
 const cors = require("cors");
 // const promise = require("mysql2/promise")
 const { M_PLUS_1 } = require("next/font/google");
-const { DatabaseBackup } = require("lucide-react");
+// const { DatabaseBackup } = require("lucide-react");
 
 const app = express()
 app.use(cors());
