@@ -2,7 +2,9 @@
 import Post from "@/components/Post";
 import Button from "./Button";
 import React, { useState, useEffect } from "react";
+
 import axios from "axios";
+import {PostsFetch10AscTimestamp} from "@/app/paths";
 
 import "@/styles/posts.css"
 
@@ -15,7 +17,7 @@ const Posts = () => {
     useEffect(() => {
         const fetchAllPosts = async() => {
             try {
-                const res = await axios.get(`http://localhost:3307/Posts/Fetch10?page=${page}`)
+                const res = await axios.get(`http://localhost:3307/Posts/Fetch10AscTimestamp?page=${page}`)
                 console.log(res)
                 setPosts(prevPosts => [...prevPosts, ...res.data])
             } catch (err) {
