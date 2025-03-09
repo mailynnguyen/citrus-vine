@@ -2,7 +2,7 @@
 import "../styles/sign-up.css";
 
 // React
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { User } from "lucide-react";
 
 // Images
@@ -17,7 +17,7 @@ import axios from "axios";
 const InputField = ({fieldName, fieldPlaceHolder, fieldWidth, setUsername, setPassword, setEmail}) => {
 
   const [fieldValue, setFieldValue] = useState("")
-  const onFieldValueChange = event => {
+  const onFieldValueChange = async (event) => {
     setFieldValue(event.target.value)
     if (fieldName == "Username") {setUsername(fieldValue)}
     if (fieldName == "Password") {setPassword(fieldValue)}
@@ -33,9 +33,6 @@ const InputField = ({fieldName, fieldPlaceHolder, fieldWidth, setUsername, setPa
 }
 
 const Button = ({buttonText, buttonAction}) => {
-  const onHover = event => {
-    //Change button color
-  }
   return (
     <div>
       <button onClick={buttonAction} className="sign-up-button">{buttonText}</button>
@@ -43,10 +40,7 @@ const Button = ({buttonText, buttonAction}) => {
   )
 }
 
-const SubmitData = (username, password, email) => {
-  // Verifying data
-  // Entering data into database
-  // Alert: Congratulations you have an account notif
+const SubmitData = async (username, password, email) => {
 
   /*
       Prevent alert spam on refresh by having this base case exist.
@@ -54,41 +48,20 @@ const SubmitData = (username, password, email) => {
   if (username == "" || password == "" || email == "") {
     return;
   }
+  console.log(`Given username: ${username}`)
+  console.log(`Given password: ${password}`)
+  console.log(`Given email: ${email}`)
+
 
   /*
       Checks whether the username specified already exists. UserID is primary
       key but it would also just be weird for two accounts to have the same 
       username.
   */
-  // var existence_json = {
-  //   "Username": `${username}`
-  // }
-  // console.log("existence_json: ", existence_json)
-
-  // const CheckExists = async (username) => {
-  //   try{
-  //     return await axios.get(`http://localhost:3307/UsersQuery/Exists/${username}`)
-  //   }
-  //   catch (err) {
-  //     console.log("Error: ", err)
-  //   }
-  // }    
-  // CheckExists(username)
-  //   .then((result) => {
-
-  //     const does_username_exist = result.data[0].Existence
-  //     if (does_username_exist) {
-  //       alert("Invalid username. Username already exists!")
-  //     }
-  //     else {
-  //       console.log("Valid username!")
-  //     }
-  //   })
-
   const CheckExists = async (username) => {
     try{
       var result = await axios.post(UsersCheckUsernameExists, {"Username": `\'${username}\'`})
-      console.log("try result: ", result)
+      console.log("[CheckExists] result: ", result)
       return result;
     }
     catch (err) {
@@ -109,41 +82,33 @@ const SubmitData = (username, password, email) => {
       }
     })
 
-  // console.log("Exists check: ", does_username_already_exist.then(result))
-  // async function CheckUsernameExists(ex_json) {
-  //   try {
-  //     var res = axios.post(UsersCheckUsernameExists, existence_json)
-  //     console.log("res: ", res)
-  //   }
-  //   catch(err) {
-  //     console.log("Error: ", err)
-  //   }
-  // }
-
-
-  // does_username_already_exist = CheckUsernameExists()
-  // console.log("does: ", does_username_already_exist)
-
-  
-
 
   /*
       Preparing information for submission. Is very nice to structure
       everything in a nice json-like variable.
   */
-  // var submission_json = {
-  //   "Username": `\'${username}\'`, 
-  //   "Password": `\'${password}\'`,
-  //   "Email": `\'${email}\'`
-  // }
-  // var submission_result = axios.post(UsersInsertForward, {submission_json})
-  // console.log("submission_result: ", submission_result)
-
+  const AddAccount = async (username, password, email) => {
+    try {
+      var submission_json = {
+        "Username": `\'${username}\'`, 
+        "Password": `\'${password}\'`,
+        "Bio": `\'Hey I'm ${username}!\'`,
+        "Email": `\'${email}\'`
+      }
+      var result = await axios.post(UsersInsertForward, submission_json)
+      console.log("[AddAccount] result: ", result)
+      return result;
+    }
+    catch (err) {
+      console.log("Error: ", err)
+    }
+  }
+  AddAccount(username, password, email)
+    .then((result) => {
+      console.log("Ran AddAcount: ", result)
+    })
   
-  // var does_username_exist_now = axios.post(UsersCheckUsernameExists, existence_json)
-  // if (!does_username_exist_now) {
-  //   alert("Unsuccessful account creation! Please make sure all fields are correctly filled!")
-  // }
+
 }
 
 const SignUp = () => {
@@ -151,6 +116,19 @@ const SignUp = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [email, setEmail] = useState("")
+
+  const updateUsername = (updatedUsername) => {
+    setUsername(prevUsername => updatedUsername)
+  }
+  const updatePassword = (updatedPassword) => {
+    setPassword(prevPassword => updatedPassword)
+  }
+  const updateEmail = (updatedEmail) => {
+    setEmail(prevEmail => updatedEmail)
+  }
+  useEffect(() => {
+    console.log("Updated parameters...")
+  }, [username, password, email])
 
   console.log("\n")
   console.log("Username: ", username)
@@ -176,28 +154,28 @@ const SignUp = () => {
 
         <InputField fieldName="Username" 
           fieldPlaceHolder="Enter user name..." 
-          setUsername={setUsername}
-          setPassword={setPassword}
-          setEmail={setEmail}
+          setUsername={updateUsername}
+          setPassword={updatePassword}
+          setEmail={updateEmail}
         />
         <InputField fieldName="Password" 
           fieldPlaceHolder="Enter password..."
-          setUsername={setUsername}
-          setPassword={setPassword}
-          setEmail={setEmail}
+          setUsername={updateUsername}
+          setPassword={updatePassword}
+          setEmail={updateEmail}
         />
         <InputField fieldName="Email" 
           fieldPlaceHolder="Enter email..." 
           fieldWidth="100%"
-          setUsername={setUsername}
-          setPassword={setPassword}  
-          setEmail={setEmail}
+          setUsername={updateUsername}
+          setPassword={updatePassword}  
+          setEmail={updateEmail}
         />
       </div>
 
       <div className="sign-up-button-container">
         <Button buttonText="Create Account " 
-          buttonAction={SubmitData(username, password, email)}
+          buttonAction={() => SubmitData(username, password, email)}
         />
       </div>
 
