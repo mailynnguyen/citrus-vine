@@ -6,7 +6,6 @@ const cors = require("cors");
 const { M_PLUS_1 } = require("next/font/google");
 // const { DatabaseBackup } = require("lucide-react");
 
-
 const app = express()
 app.use(cors());
 app.use(express.json());
@@ -95,6 +94,7 @@ const Prior = ""
                 const PostsFetchDescLikes = Posts + "/FetchDescLikes"
                 const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
                 const PostsFetch10AscTimestamp = Posts + "/Fetch10AscTimestamp"
+                const PostsFetch10DescTimestamp = Posts + "/Fetch10DescTimestamp"
                 const PostsFetchDescTimestamp = Posts + "/FetchOnDescTimestamp"
 
                 const PostsFetchOnPostID = Posts + "/FetchOnPostID"
@@ -302,6 +302,36 @@ const Prior = ""
                         }
                 );
         });
+
+        
+        /*
+                .get parameters: [Path: str]
+                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.get(PostsFetch10DescTimestamp, (req, res) => {
+                const offset = (req.query.page - 1) * 10
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        ORDER BY A.Timestamp DESC
+                        LIMIT 10 OFFSET ${offset}
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
 
 
         /*
