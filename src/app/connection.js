@@ -1404,8 +1404,7 @@ const Prior = ""
                                 ${username}, 
                                 ${password}, 
                                 ${bio}, 
-                                ${email}
-                        )`, 
+                                ${email})`, 
 
                         (err, data) => {
                                 if (err) {
@@ -1448,7 +1447,8 @@ const Prior = ""
                                 ${username}, 
                                 ${password}, 
                                 ${bio}, 
-                                ${email})`, 
+                                ${email})
+                        `, 
 
                         (err, data) => {
                                 if (err) {
