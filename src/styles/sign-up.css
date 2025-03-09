@@ -27,18 +27,24 @@
 }*/
 
 #sign-up-background {
-  /*background-image: url(../images/pusheen-background-upscaled.png);*/
+  /* background-image: url(../images/pusheen-background-upscaled.png); */
   background-color: #7CA7E1;
-  /*background-size: cover;
+  background-size: cover;
   background-repeat: no-repeat;
-  background-position: center center;*/
-  /*min-height: "100vh";*/
+  width: 100vw;
+  height: 100vh;
+  margin: 0%;
+  padding: 0%;
+  /* background-position: center; */
+  /* min-height: "100vh"; */
 }
 
 .sign-up-text {
   color:white;
   font-weight: bold;
 }
+
+
 
 .sign-up-field-container {
   margin: 0 25%;
@@ -61,6 +67,13 @@
   border-radius: 1.5em;
   width: 100%;
 }
+.sign-up-input-filled {
+  color: rgb(87, 87, 87);
+  font-size: inherit;
+  padding: .5rem 1rem;
+  border-radius: 1.5em;
+  width: 100%;
+}
 
 .input-field {
   box-sizing: border-box;
@@ -70,6 +83,7 @@
 
 .sign-up-button {
   font-size: 1.4rem;
+  color: rgb(87, 87, 87);
   border-radius: 1.5em; 
   
   font-family: "IndieFlower";
