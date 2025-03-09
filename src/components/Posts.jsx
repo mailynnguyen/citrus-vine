@@ -40,6 +40,7 @@ const Posts = ({collectedText}) => {
     const filterPosts = async() => {
         try {
             if (filterText.length == 0) {
+                setOriginalPosts([])
                 setPosts([])
                 ogFetchAllPosts()
                 fetchAllPosts()
