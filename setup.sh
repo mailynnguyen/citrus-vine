@@ -26,3 +26,9 @@
         # Launch
                 # node src/app/connection.js
                         # Jules's database
+
+#Testing
+        #Dependencies
+        npm install -D jest jest-environment-jsdom @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event ts-node
+        npm install --save-dev babel-jest @babel/core @babel/preset-env @babel/preset-react
+        npm install -D jest-css-modules
