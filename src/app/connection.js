@@ -6,6 +6,7 @@ const cors = require("cors");
 const { M_PLUS_1 } = require("next/font/google");
 // const { DatabaseBackup } = require("lucide-react");
 
+
 const app = express()
 app.use(cors());
 app.use(express.json());
@@ -40,7 +41,14 @@ app.listen(3307, () => {
   console.log(`App connected to db! Please visit http://localhost:3307/ to see returns.`)
 })
       
-
+app.get("/", (req, res) => {
+        res.send("Connection.js is functional.")
+})
+/*
+        Routers
+*/
+const userQueryRouter = require('./query-routes/users')
+app.use('/UsersQuery', userQueryRouter)
 
 /*
         NOTES:
@@ -324,28 +332,33 @@ const Prior = ""
 
         /*
                 .post parameters: [Path: str, {"UserID": int}]
-                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+                .get return: ARRAY[{"Timestamp": str, "Content": str, "Username": str, "NumLikes": int, "NumComments": int]
+
+                this change is better because we should not be putting info like PostID or UserID on the frontend- it's
+                a major security risk. the frontend should only be getting the data is dispalying.
+
+                additionally, getting Username, NumLikes & NumComments this way means columns like Posts.Username and 
+                PostLikes.Likes don't need to be used. we won't need to deal w/ incrementing likes & all that.
         */
         app.post(PostsFetchOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        WHERE A.UserID = ${user_id}`,
+                        SELECT P.Timestamp, P.Content, U.Username, 
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.UserID = U.UserID AND Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.UserID = U.UserID AND Cl.CommentID = C.CommentID) AS NumComments
+                        FROM Posts P, Users U, Comments C
+                        CROSS JOIN (SELECT ${user_id} as Param) AS x
+                        WHERE P.UserID = x.Param AND U.UserID = x.Param AND P.Anonymous = 0
+                        `, 
                         
-                        (err, data) => {
-                                if (err) {
-                                        return res.json(err)
-                                }
-                                else {
-                                        return res.json(data)
-                                }
+                (err, data) => {
+                        if (err) {
+                                return res.json(err)
                         }
-                );
+                        else {
+                                return res.json(data)
+                        }
+                });
         });
 
 
@@ -1397,8 +1410,7 @@ const Prior = ""
                                 ${username}, 
                                 ${password}, 
                                 ${bio}, 
-                                ${email}
-                        )`, 
+                                ${email})`, 
 
                         (err, data) => {
                                 if (err) {
@@ -1441,7 +1453,8 @@ const Prior = ""
                                 ${username}, 
                                 ${password}, 
                                 ${bio}, 
-                                ${email})`, 
+                                ${email})
+                        `, 
 
                         (err, data) => {
                                 if (err) {
@@ -1530,6 +1543,7 @@ const Prior = ""
                         }
                 );
         });
+
 
 
         /*

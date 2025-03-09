@@ -4,8 +4,11 @@ import { Heart } from 'lucide-react';
 import '@/styles/signin.css';
 import CitrusBg from "../images/citrus-bg.jpeg";
 
+
 import axios from "axios";
 import { UsersValidateAccount } from "@/app/paths";
+import Link from 'next/link'
+
 
 function SignIn() {
     const [user, enterUser] = useState("");
@@ -61,7 +64,7 @@ function SignIn() {
 
             {/*Need to implement functionality for buttons*/}
             <div id="alt-sign-in">
-                <button className="sign-in-button">Don't have an account?</button>
+                <Link className="sign-in-button" href="/signup">Don't have an account?</Link>
 
                 <button className="sign-in-button">Forgot password?</button>
             </div>
