@@ -21,7 +21,7 @@ const Posts = ({collectedText}) => {
     }
     const ogFetchAllPosts = async() => {
         try {
-            const res = await axios.get(`http://localhost:3307/Posts/Fetch10AscTimestamp?page=${page}`)
+            const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)
             console.log(res)
             setOriginalPosts(prevPosts => [...prevPosts, ...res.data])
         } catch (err) {
@@ -30,7 +30,7 @@ const Posts = ({collectedText}) => {
     };
     const fetchAllPosts = async() => {
             try {
-                const res = await axios.get(`http://localhost:3307/Posts/Fetch10AscTimestamp?page=${page}`)
+                const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)
                 console.log(res)
                 setPosts(prevPosts => [...prevPosts, ...res.data])
             } catch (err) {

@@ -13,6 +13,7 @@ const Posts = Prior + "/Posts"
         export const PostsFetchAscTimestampOnUserID = Posts + "/FetchOnAscTimestampOnUserID"
         export const PostsFetchDescTimestampOnUserID = Posts + "/FetchOnDescTimestampOnUserID"
         export const PostsFetch10AscTimestamp = Posts + "/Fetch10AscTimestamp"
+        export const PostsFetch10DescTimestamp = Posts + "/Fetch10AscTimestamp"
         export const PostsFetchAscLikesOnUserID = Posts + "/FetchOnAscLikesOnUserID"
         export const PostsFetchDescLikesOnUserID = Posts + "/FetchOnDescLikesOnUserID"
 
