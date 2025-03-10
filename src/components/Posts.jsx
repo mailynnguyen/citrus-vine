@@ -11,63 +11,74 @@ import "@/styles/posts.css"
 
 const Posts = ({collectedText}) => {
 
-    const [original_posts, setOriginalPosts] = useState([])
-    const [posts, setPosts] = useState([])
+    const [originalPosts, setOriginalPosts] = useState([])
+    const [filteredPosts, setFilteredPosts] = useState([])
     const [page, setPage] = useState(1)
     const [filterText, setFilterText] = useState("")
+
 
     //Need a way of tracking current user, not like this variable
     const userID = 1;
 
     console.log("filterText: ", filterText)
-    if (collectedText != filterText) {
-        setFilterText(collectedText)
-    }
-    const ogFetchAllPosts = async() => {
-        try {
-            // const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)\
+    console.log("filterTextLength: ", filterText.length)
+    console.log("collectedText: ", collectedText)
+    console.log("collectedTextLegnth: ", filterText.length)
 
+    var clean = false;
+    const changeFilterText = async(text) => {
+        setFilterText(text)
+    }
+    if (filterText != collectedText) {
+        changeFilterText(collectedText)
+        .then(() => {
+            clean = true;
+        })
+    }
+
+    const fetchOriginalPosts = async() => {
+        try {
             var submission = {
                 "UserID": userID,
                 "Offset": page
             }
-            console.log("Submission: ", submission)
-            const res = await axios.post(PostsFetch10DescTimestampOnUserID, submission)
-            console.log("OGFetchAllPosts: ", res)
-            setOriginalPosts(prevPosts => [...prevPosts, ...res.data])
+            await axios.post(PostsFetch10DescTimestampOnUserID, submission)
+            .then((res) => {
+                setOriginalPosts(prevPosts => [...prevPosts, ...res.data])
+            })
         } catch (err) {
             console.log(err)
         }
     };
-    const fetchAllPosts = async() => {
-            try {
-                // const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)
-
-                var submission = {
-                    "UserID": userID,
-                    "Offset": page
-                }
-                // const res = await axios.get(PostsFetch10DescTimestampOnUserID, submission)
-                const res = await axios.post(PostsFetch10DescTimestampOnUserID, submission)
-                console.log("FetchAllPosts: ", res)
-                setPosts(prevPosts => [...prevPosts, ...res.data])
-            } catch (err) {
-                console.log(err)
+    const resetFilteredPosts = async() => {
+        try {
+            var submission = {
+                "UserID": userID,
+                "Offset": page
             }
-        };
-    const filterPosts = async() => {
+            // setFilteredPosts(originalPosts)
+            await axios.post(PostsFetch10DescTimestampOnUserID, submission)
+            .then((res) => {
+                setFilteredPosts(prevPosts => [...prevPosts, ...res.data])
+            })
+        } catch (err) {
+            console.log(err)
+        }
+    };
+    const fetchFilteredPosts = async() => {
         try {
             if (filterText.length == 0) {
-                setOriginalPosts([])
-                setPosts([])
-                ogFetchAllPosts()
-                fetchAllPosts()
-                console.log("filterText.length: ", filterText.length)
+                console.log("[filterText.length]: ", filterText.length)
+                fetchOriginalPosts()
+                .then(() => {
+                    resetFilteredPosts();
+                })
                 return;
             }
-            console.log("Filtering...")
+
             var filteredPosts = []
-            for (var i = 0, post; i < original_posts.length, post = original_posts[i]; ++i) {
+            console.log("Performing filtering operation...")
+            for (var i = 0, post; i < originalPosts.length, post = originalPosts[i]; ++i) {
                 if (post.Content.includes(filterText) || post.Username.includes(filterText)) {
                     console.log("Found a non-filtered post")
                     filteredPosts.push(post)
@@ -79,16 +90,27 @@ const Posts = ({collectedText}) => {
             console.log(err)
         }
     }
-    
+
+    const initialSetUp = async() => {
+        fetchFilteredPosts()
+        .then(() => {
+            console.log("Initial [originalPosts]: ", originalPosts)
+            console.log("Initial [filteredPosts]: ", filteredPosts)
+        })
+    }
 
     useEffect(() => {
-        filterPosts();
-    },[filterText])
+        fetchFilteredPosts()
+    }, [filterText])
 
+    // useEffect(() => {
+    //     fetchFilteredPosts()
+    // },[filterText])
 
+    console.log("[filteredPosts]: ", filteredPosts)
     return (
         <div id="posts">
-            {posts
+            {filteredPosts
                 // .sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)) // Sort by date_time from earliest to latest
                 .map((post, index) => (
                     <Post 
