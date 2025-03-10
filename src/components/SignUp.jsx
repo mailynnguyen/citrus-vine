@@ -1,89 +1,175 @@
 "use client";
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from "lucide-react";
+import axios from 'axios';
 import "../styles/sign-up.css";
 
-import { useState } from 'react'
 
-import PusheenImage from "../images/pusheen-background-upscaled-dimmed.png"
-import CitrusVineLogo from "../images/citrus-vine-logo-scaled.png"
+const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onChange}) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    return (
+        <div style={{ position: "relative", display: "inline-block" }}>
+            <div className="sign-up-text" style={{ fontWeight: "bold", color: "white" }}>{fieldName}</div>
+            <input 
+                value={value} 
+                placeholder={fieldPlaceHolder} 
+                type={type === "password" && !showPassword ? "password" : "text"} // Toggle visibility
+                onChange={onChange} 
+                style={{ 
+                    width: `${fieldWidth}`, 
+                    height: "30px", 
+                    borderRadius: "10px", 
+                    paddingLeft: "10px", 
+                    paddingRight: "35px" // Space for the eye icon 
+                }} 
+            />  
+            {type === "password" && (
+                <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    style={{ 
+                        position: "absolute", 
+                        right: "10px", 
+                        top: "70%", 
+                        transform: "translateY(-50%)",
+                        background: "none", 
+                        border: "none", 
+                        cursor: "pointer",
+                        color: "black"
+                    }}
+                >
+                    {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                </button>
+            )}
+        </div>
+    );
+}
 
 
-// const PageBackground = (img) => {
-//   const [backgroundValue, setBackgroundValue] = useState(`url(${img})`)
-//   return (
-//     <div body = {{
-//       backgroundImage: backgroundValue,
-//       backgroundSize: "cover",
-//       backgroundRepeat: "repeat",
-//       backgroundPosition: "center",
-//       minHeight: "100vh"
-//     }}>
-//     </div>
-//   )
-// }
+function SignUp() {
+  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+  const [firstName, enterFirstName] = useState("");
+  const [lastName, enterLastName] = useState("");
+  const [username, enterUsername] = useState("");
+  const [password, enterPassword] = useState("");
+  const [email, enterEmail] = useState("");
 
-const InputField = ({fieldName, fieldPlaceHolder, fieldWidth}) => {
 
-  const [fieldValue, setFieldValue] = useState("")
-  const onFieldValueChange = event => {
-    setFieldValue(event.target.value)
+  // useEffect(() => {
+  //   setIsClient(true);
+  // }, [])
+
+  // Redirect to sign-in page when "Have an account?" button is clicked.
+  const handleSignIn = () => {
+    router.push('/');
   }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!firstName || !lastName || !username || !password || !email) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:3307/api/auth/signup', {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: username.trim(),
+        password: password.trim(),
+        email: email.trim(),
+      });
+
+      if (response.status == 200) {
+        console.log(response.data);
+        console.log('Sign-up Successful!');
+        router.push('/home');
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Sign-up Error:", error);
+      alert("An error occured while signing up. Please try again.");
+    }
+  }
+
+  if (isClient) return null;
+
   return (
     <div>
-      <div className="sign-up-text" style={{fontWeight: "bold", color:"white"}}>{fieldName}</div>
-      <input value={fieldValue} placeholder={fieldPlaceHolder} type="text" onChange={onFieldValueChange} style={{width:`${fieldWidth}`, height:"30px", borderRadius:"10px", paddingLeft:"10px"}} />  
-    </div>
-  )
-}
-
-const Button = ({buttonText, buttonAction}) => {
-  const onHover = event => {
-    //Change button color
-  }
-  return (
-    <div>
-      <button onClick={buttonAction} className="sign-up-button">{buttonText}</button>
-    </div>
-  )
-}
-
-const SubmitData = () => {
-  // Verifying data
-  // Entering data into database
-  // Alert: Congratulations you have an account notif
-}
-
-const SignUp = () => {
-
-  return (
-
-    <div style ={{
-      backgroundImage: `url(${PusheenImage.src})`,
-      backgroundSize: "cover",
-      backgroundRepeat: "repeat",
-      backgroundPosition: "center",
-      minHeight: "100vh",
-    }}>
-
-        <div className="sign-up-title-container">
-          <div className="sign-up-title">Sign Up</div>
-          <img src={CitrusVineLogo.src} className="sign-up-citrus-vine-logo"></img>
+        <div className="title-container">
+          <div className="citrus-vine-title">Citrus Vine</div>
+          <div className='sign-up-title'>Sign Up</div>
         </div>
         
-        
-        <div className="sign-up-field-container">
-          <InputField fieldName="First Name" fieldPlaceHolder="Enter first name..."/>
-          <InputField fieldName="Last Name" fieldPlaceHolder="Enter last name..."/>
-          <InputField fieldName="Username" fieldPlaceHolder="Enter user name..."/>
-          <InputField fieldName="Password" fieldPlaceHolder="Enter password..."/>
-          <InputField fieldName="Email" fieldPlaceHolder="Enter email..." fieldWidth="710px"/>
-        </div>
+        <form className="sign-up-form" onSubmit={handleSubmit}>
+          <div className='input-row'>
+            <InputField 
+                fieldName="First Name"
+                type="text"
+                id="firstNameEntry"
+                className="input-text" 
+                fieldPlaceHolder="ex: John" 
+                value={firstName} 
+                onChange={(e) => enterFirstName(e.target.value)}
+            />
+            <InputField 
+                fieldName="Last Name"
+                type="text"
+                id="lasttNameEntry"
+                className="input-text" 
+                fieldPlaceHolder="ex: Doe" 
+                value={lastName} 
+                onChange={(e) => enterLastName(e.target.value)}
+            />
+          </div>
+          <div className='input-row'>
+            <InputField 
+                fieldName="Username"
+                type="text"
+                id="userEntry"
+                className="input-text" 
+                fieldPlaceHolder="ex: DoeBoy_123" 
+                value={username} 
+                onChange={(e) => enterUsername(e.target.value)}
+            />
+            <InputField 
+                fieldName="Password"
+                type="password" 
+                id="passwordEntry" 
+                className="input-text" 
+                fieldPlaceHolder="Enter here" 
+                value={password} 
+                onChange={(e) => enterPassword(e.target.value)}
+            />
+          </div>
+          <div className='input-row'>
+            <InputField 
+                fieldName="Email"
+                type="text" 
+                id="emailEntry" 
+                className="email-container" 
+                fieldPlaceHolder="ex: jdoe001@ucr.edu" 
+                fieldWidth="400px"
+                value={email} 
+                onChange={(e) => enterEmail(e.target.value)}
+            />
+          </div>
+          <input 
+              type="submit" 
+              value="Sign Up" 
+              className="sign-up-button"
+          />
+        </form>
 
-        <div className="sign-up-button-container">
-          <Button buttonText="Create Account " buttonAction={SubmitData}></Button>
+        <div id="alt-sign-in">
+          <button className="sign-up-button" onClick={handleSignIn}>Have have an account?</button>
         </div>
-
     </div>
-
   )
 }
 

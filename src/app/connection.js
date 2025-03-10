@@ -1,17 +1,19 @@
 // App Initialization
-const express = require("express")
-const mysql = require("mysql2")
-const cors = require("cors");
-// const promise = require("mysql2/promise")
-const { M_PLUS_1 } = require("next/font/google");
+// const GoogleStrategy = require('passport-google-oauth20').Strategy;
+import express from 'express';
+import mysql from 'mysql2';
+import cors from 'cors';
+import passport from 'passport';
+import session from 'express-session';
+import GoogleStrategy from 'passport-google-oauth20';
 
-const app = express()
-app.use(cors());
+
+const app = express();
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
-// app.use(promise());
 
 
-//Database Server
+// Database Server
 var hostname = "e7mhj.h.filess.io";
 var database = "CitrusVineDB_oxygenbend";
 var port = "3307";
@@ -19,26 +21,36 @@ var username = "CitrusVineDB_oxygenbend";
 var password = "51eb7f921a83851a80e14c57d7c81c80624c1c12";
 
 var db = mysql.createConnection({
-  host: hostname,
-  user: username,
-  password,
-  database,
-  port,
+        host: hostname,
+        user: username,
+        password,
+        database,
+        port,
 });
 
 db.connect(function (err) {
-  if (err) throw err;
-  console.log(`Connected to db: ${hostname}:${port}!`);
+        if (err) throw err;
+        console.log(`Connected to db: ${hostname}:${port}!`);
 });
 
-// db.query("SELECT 1+1").on("result", function (row) {
-//   console.log(row);
-// });
-
+// Web server
 app.listen(3307, () => {
-  console.log(`App connected to db! Please visit http://localhost:3307/ to see returns.`)
+        console.log(`App connected to db! Please visit http://localhost:3307/ to see returns.`)
 })
-      
+
+
+
+/* 
+----------------------------- AUTHENTCATION & AUTHORIZATION -----------------------------
+*/
+
+// const signInRoute = require('./api/auth/signin');
+import signInRoute from './api/auth/signin.js';
+app.use('/api/auth', signInRoute);
+
+import signUpRoute from './api/auth/signup.js';
+app.use('/api/auth/signup', signUpRoute);
+
 
 
 /*
@@ -2018,3 +2030,5 @@ const Prior = ""
                         }
                 });
         });
+
+export default db;

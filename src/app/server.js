@@ -1,21 +1,17 @@
-const express = require('express');
-const mysql = require('mysql2');
+import express from 'express';
+import cors from 'cors';
+
+// Routes
+import signInRoute from './api/auth/signin.js';
+import signUpRoute from './api/auth/signup.js;'
+
 const app = express();
-const port = 3000;
+app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(express.json());
 
-// Create a connection to the database
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'Jamnr@2025',
-  database: 'citrus_vine'
-});
+app.use('/api/auth', signInRoute);
+app.use('/api/auth', signUpRoute);
 
-// Connect to the MySQL server
-connection.connect((err) => {
-  if (err) {
-    console.error('Error connecting: ' + err.stack);
-    return;
-  }
-  console.log('Connected as id ' + connection.threadId);
+app.listen(3307, () => {
+  console.log('Server is running on port 3307');
 });
