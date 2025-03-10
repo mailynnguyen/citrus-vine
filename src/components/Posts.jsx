@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 
 import axios from "axios";
 import {PostsFetch10AscTimestamp} from "@/app/paths";
+import { PostsFetch10DescTimestampOnUserID } from "@/app/paths";
 
 import "@/styles/posts.css"
 
@@ -15,14 +16,24 @@ const Posts = ({collectedText}) => {
     const [page, setPage] = useState(1)
     const [filterText, setFilterText] = useState("")
 
+    //Need a way of tracking current user, not like this variable
+    const userID = 1;
+
     console.log("filterText: ", filterText)
     if (collectedText != filterText) {
         setFilterText(collectedText)
     }
     const ogFetchAllPosts = async() => {
         try {
-            const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)
-            console.log(res)
+            // const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)\
+
+            var submission = {
+                "UserID": userID,
+                "Offset": page
+            }
+            console.log("Submission: ", submission)
+            const res = await axios.post(PostsFetch10DescTimestampOnUserID, submission)
+            console.log("OGFetchAllPosts: ", res)
             setOriginalPosts(prevPosts => [...prevPosts, ...res.data])
         } catch (err) {
             console.log(err)
@@ -30,8 +41,15 @@ const Posts = ({collectedText}) => {
     };
     const fetchAllPosts = async() => {
             try {
-                const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)
-                console.log(res)
+                // const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestamp?page=${page}`)
+
+                var submission = {
+                    "UserID": userID,
+                    "Offset": page
+                }
+                // const res = await axios.get(PostsFetch10DescTimestampOnUserID, submission)
+                const res = await axios.post(PostsFetch10DescTimestampOnUserID, submission)
+                console.log("FetchAllPosts: ", res)
                 setPosts(prevPosts => [...prevPosts, ...res.data])
             } catch (err) {
                 console.log(err)
@@ -62,12 +80,7 @@ const Posts = ({collectedText}) => {
         }
     }
     
-    // useEffect(() => {
-    //     fetchAllPosts();
-    // },[page]);
-    // useEffect(() => {
-    //     ogFetchAllPosts()
-    // }, [original_posts]);
+
     useEffect(() => {
         filterPosts();
     },[filterText])
@@ -82,6 +95,9 @@ const Posts = ({collectedText}) => {
                         key={index}
                         body={post.Content}
                         display_name={post.Username}
+                        num_likes={post.Likes}
+                        is_liked_by_user={post.IsLikedByUser}
+                        num_comments={post.CommentCount}
                         date_time={new Date(post.Timestamp).toISOString().slice(0, 19).replace('T', ' ')} // doing the splice b/c instance of Date
                     />
             ))}

@@ -46,8 +46,8 @@ app.get("/", (req, res) => {
 /*
         Routers
 */
-const userQueryRouter = require('./query-routes/users')
-app.use('/UsersQuery', userQueryRouter)
+// const userQueryRouter = require('./query-routes/users')
+// app.use('/UsersQuery', userQueryRouter)
 
 /*
         NOTES:
@@ -95,6 +95,8 @@ const Prior = ""
                 const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
                 const PostsFetch10AscTimestamp = Posts + "/Fetch10AscTimestamp"
                 const PostsFetch10DescTimestamp = Posts + "/Fetch10DescTimestamp"
+                const PostsFetch10AscTimestampOnUserID = Posts + "/Fetch10AscTimestampOnUserID"
+                const PostsFetch10DescTimestampOnUserID = Posts + "/Fetch10DescTimestampOnUserID"
                 const PostsFetchDescTimestamp = Posts + "/FetchOnDescTimestamp"
 
                 const PostsFetchOnPostID = Posts + "/FetchOnPostID"
@@ -106,6 +108,7 @@ const Prior = ""
                 const PostsFetchDescLikesOnUserID = Posts + "/FetchOnDescLikesOnUserID"
 
                 const PostsGetLikes = Posts + "/FetchLikes"
+                const PostsGetIsLikedByUser = Posts + "/IsLikedByUser"
 
                 const PostsInsertManual = Posts + "/InsertManual"
                 const PostsInsertForward = Posts + "/InsertForward"
@@ -332,6 +335,76 @@ const Prior = ""
                 );
         });
 
+
+        /*
+                .post parameters: [Path: str, {"UserID": int, "Offset": int}]
+                .post return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int, "IsLikedByuser": bool]
+        */
+        app.post(PostsFetch10AscTimestampOnUserID, (req, res) => {
+                const user_id = (req.body.UserID)
+                const offset = (req.body.Offset - 1) * 10
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount,
+                        (SELECT COUNT(*) > 0
+                        FROM PostLikes D
+                        WHERE D.PostID = A.PostID 
+                        AND D.UserID = ${user_id}) as IsLikedByUser
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        ORDER BY A.Timestamp ASC
+                        LIMIT 10 OFFSET ${offset}
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .post parameters: [Path: str, {"UserID": int, "Offset": int}]
+                .post return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int, "IsLikedByuser": bool]
+        */
+        app.post(PostsFetch10DescTimestampOnUserID, (req, res) => {
+                const user_id = req.body.UserID
+                const offset = (req.body.Offset - 1) * 10
+
+                console.log("app.post [user_id]: ", user_id)
+                console.log("app.post [offset]: ", offset)
+                db.query(`
+                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
+                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
+                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount,
+                        (SELECT COUNT(*) > 0
+                        FROM PostLikes D
+                        WHERE D.PostID = A.PostID 
+                        AND D.UserID = ${user_id}) as IsLikedByUser
+                        FROM Posts A
+                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
+                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        ORDER BY A.Timestamp DESC
+                        LIMIT 10 OFFSET ${offset}
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
 
 
         /*
@@ -674,6 +747,31 @@ const Prior = ""
                         SELECT COUNT(*)
                         FROM PostLikes
                         WHERE PostID = ${post_id}
+                        `,
+                (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                });
+
+        });
+
+        
+        /*
+                .post parameters: [path: str, {"PostID": int, "UserID": int}]
+                .post return: [{"Outcome": bool}]
+        */
+        app.post(PostsGetIsLikedByUser, (req, res) => {
+                const post_id = req.body.PostID
+                const user_id = req.body.UserID
+                db.query(`
+                        SELECT COUNT(*) > 0 AS Outcome
+                        FROM PostLikes
+                        WHERE PostID = ${post_id} 
+                        AND UserID = ${user_id}
                         `,
                 (err, data) => {
                         if (err) {
