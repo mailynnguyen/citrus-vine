@@ -54,3 +54,30 @@
     flex-direction: column;
     gap: 8px;  /* Adjusted gap */
 }
+
+@media (prefers-color-scheme: dark) {
+    .search-input{
+        background-color: #5b5b5b;
+        color: #e5e7eb;
+    }
+
+    .search-input::placeholder {
+        color: #e5e7eb; 
+    }
+    
+    .search-icon {
+        color: #e5e7eb;
+    }
+
+    .search-button {
+        background-color: #4e81c4;
+    }
+
+    .search-button:hover {
+        background-color: #7CA7E1;
+    }
+
+    .search-results {
+        background-color: #273343;
+    }
+}
