@@ -49,7 +49,7 @@ import signInRoute from './api/auth/signin.js';
 app.use('/api/auth', signInRoute);
 
 import signUpRoute from './api/auth/signup.js';
-app.use('/api/auth/signup', signUpRoute);
+app.use('/api/auth', signUpRoute);
 
 
 

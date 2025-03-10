@@ -90,8 +90,12 @@ function SignIn() {
                 alert(`Error: ${data.message}`);
             }
         } catch (error) {
-            console.error("Sign-in error:", error);
-            alert("An error occurred while signing in. Please try again.");
+            // console.error("Sign-in error:", error);
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("An error occurred while signing in. Please try again.");
+            }
         }
     }
 

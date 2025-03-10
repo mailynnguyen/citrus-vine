@@ -58,9 +58,9 @@ function SignUp() {
   const [email, enterEmail] = useState("");
 
 
-  // useEffect(() => {
-  //   setIsClient(true);
-  // }, [])
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Redirect to sign-in page when "Have an account?" button is clicked.
   const handleSignIn = () => {
@@ -92,12 +92,15 @@ function SignUp() {
         alert(`Error: ${data.message}`);
       }
     } catch (error) {
-      console.error("Sign-up Error:", error);
-      alert("An error occured while signing up. Please try again.");
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("An error occured while signing up. Please try again.");
+      }
     }
   }
 
-  if (isClient) return null;
+  // if (isClient) return null;
 
   return (
     <div>
