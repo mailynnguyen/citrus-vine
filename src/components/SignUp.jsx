@@ -6,6 +6,7 @@ import axios from 'axios';
 import "../styles/sign-up.css";
 
 
+
 const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onChange}) => {
     const [showPassword, setShowPassword] = useState(false);
 

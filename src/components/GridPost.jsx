@@ -1,30 +1,31 @@
+
 "use client";
 import React, { useState } from "react";
 import { Heart, MessageCircle } from "lucide-react";
 import "@/styles/gridpost.css";
 
-const GridPost = () => {
+const GridPost = ({body, date_time, display_name}) => {
   const [like, setLike] = useState(false);
 
   return (
-    <div id="gridpost">
-      <div id="post-header">
-        <div id="title">
-            <div id="profile-pic"></div>
-            <div id="display-name">IEatDogFood</div>
+    <div className="gridpost">
+      <div className="gridpost-info-holder">
+        <div className="gridpost-profile-pic"></div>
+        <div /*id="display-name"*/ className="gridpost-name">
+          {display_name}
         </div>
-        <div id="time-stamp">
-          <span className="date">12/12/2024</span>
-          <span className="time">3:01 PM</span>
+        <div className="gridpost-time-stamp">
+          {date_time}
         </div>
       </div>
 
-      {/* Content */}
-      <p id="content">I am a good doggo.</p>
+      <div className="gridpost-content">
+        {body}
+      </div>
 
       {/* Buttons */}
-      <div id="buttons">
-        <div id="like-button" onClick={() => setLike(!like)}>
+      <div className="buttons-gridpost">
+        <div className="like-button" onClick={() => setLike(!like)}>
           {like ? (
             <Heart className="heart" fill="#BE4A31" strokeWidth={0} />
           ) : (
@@ -33,13 +34,14 @@ const GridPost = () => {
           <p id="like-count">1024</p>
         </div>
 
-        <div id="comment-button">
-          <MessageCircle className="comment-button" />
+        <div className="comment-button">
+          <MessageCircle className="commentbutton" />
           <p id="comment-count">2000</p>
         </div>
       </div>
     </div>
-  );
-};
+
+  )
+}
 
 export default GridPost;

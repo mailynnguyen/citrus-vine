@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css?family=Indie Flower");
 
+<<<<<<< HEAD
 body {
   background-color: #7CA7E1;
   background-image: url("https://images.pexels.com/photos/3804878/pexels-photo-3804878.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
@@ -89,15 +90,38 @@ input[type=submit]:hover {
   width: 150px;
 }
 
+
+
 .sign-up-field-container {
   margin-left: 25%; 
   margin-right: 25%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 100px 300px
+  font-size: 1.2rem;
 }
+
+.sign-up-input {
+  font-size: inherit;
+  padding: .5rem 1rem;
+  border-radius: 1.5em;
+  width: 100%;
+}
+.sign-up-input-filled {
+  color: rgb(87, 87, 87);
+  font-size: inherit;
+  padding: .5rem 1rem;
+  border-radius: 1.5em;
+  width: 100%;
+}
+
+.input-field {
+  box-sizing: border-box;
+  margin: 2%;
+  width: max(40%, 200px);
+}
+
 
 .sign-up-form, #alt-sign-in {
   display: flex;

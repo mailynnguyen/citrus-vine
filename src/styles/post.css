@@ -7,7 +7,7 @@
 
 /* temp profile pic */
 #profile-pic {
-    margin-top: -1%;
+    /*margin-top: -1%;*/
     width: 3.5rem;
     height: auto;
     aspect-ratio: 1/1;
@@ -15,15 +15,19 @@
     border-radius: 50%;
 }
 
+.right-section {
+    margin-top: 1rem;
+}
+
 #title {
     display: flex;
     align-items: center;
     gap: 1.5rem;
     font-weight: 700; /* bold */
-    margin-bottom: 2%;
+    margin: 15% 0 2% 0;
 }
 
-#buttons {
+.post-button-holder {
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -33,20 +37,20 @@
 
 
 
-#time-stamp {
+.time-stamp {
     color: #878787;
     font-size: 0.65rem;
     font-weight: 400; /* regular */
 }
 
 
-#content {
+.post-content {
     font-weight: 500; /* medium */
     margin-bottom: 2%;
 }
 
 
-#like-button {
+.post-like-button {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -54,7 +58,7 @@
     color: #858585;
 }
 
-#comment-button {
+.post-comment-button {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -66,10 +70,12 @@
 .heart:hover {
     transform: scale(1.1);
     transition: transform 0.1s ease-out;
+    cursor: pointer;
 }
 
 .comment-button:hover {
     transform: scale(1.1);
     transition: transform 0.1s ease-out;
+    cursor: pointer;
 }
 
