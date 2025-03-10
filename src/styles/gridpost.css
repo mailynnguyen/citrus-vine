@@ -8,8 +8,8 @@
     padding: 2vmax; 
     gap: 10%;
     /*overflow: hidden;*/ 
-    border-left: 1.2vmax solid orange;
-    border-right: 1.2vmax solid lightskyblue;
+    border-left: 1.2vmax solid #E1AB69;
+    border-right: 1.2vmax solid #7CA7E1;
 }
 
 .gridpost-info-holder {
@@ -115,4 +115,11 @@
 .heart:hover, .comment-button:hover {
     transform: scale(1.1);
     transition: transform 0.1s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+    .gridpost{
+        border-left-color: #c98532;
+        border-right-color: #4e81c4;
+    }
 }
