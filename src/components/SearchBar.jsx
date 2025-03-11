@@ -5,21 +5,19 @@ import "@/styles/search-bar.css"
 import { useState, useEffect } from "react";
 
 // Still need to set up web and data server to implement the search logic and search results.
-const SearchBar = ({sendText}) => {
+const SearchBar = ({resetPosts, filterPosts}) => {
 
-    var [text, setText] = useState("")
+    const [searchText, setSearchText] = useState("")
 
-    var inputText = ""
-    const ClickAction = () => {
-        if (inputText === "") {
-            console.log("Sent text 1")
-            sendText(text)
-        }
+    const HandleChange = (e) => {
+        if (e.target.value.length == 0) {
+            resetPosts()
+        } 
         else {
-            console.log("Sent text 2")
-            sendText(inputText)
+            filterPosts(e.target.value)
         }
     }
+
     return (
         <div className='search-form'>
             <div className="search-container">
@@ -27,16 +25,15 @@ const SearchBar = ({sendText}) => {
                     type="search"
                     placeholder='Type Here'
                     className='search-input'
-                    value = {text}
+                    value = {searchText}
                     onChange={
                         (e) => {
-                            setText(e.target.value);
-                            inputText = e.target.value;
+                            HandleChange(e)
+                            setSearchText(e.target.value)
                         }
                     }
                 />
-                <button className='search-button'
-                    onClick={ClickAction}>
+                <button className='search-button'>
                     <AiOutlineSearch className='search-icon'/>
                 </button>
             </div>
