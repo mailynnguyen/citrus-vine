@@ -1481,14 +1481,8 @@ const Prior = ""
                 const pfp = req.body.AssignedProfilePic
 
                 db.query(`
-                        INSERT INTO Users (UserID, Username, Password, Bio, Email, AssignedProfilePic)
-                        VALUES 
-                                ((SELECT MAX(A.UserID) + 1 FROM Users A), 
-                                ${username}, 
-                                ${password}, 
-                                ${bio}, 
-                                ${email}),
-                                ${pfp}
+                        INSERT INTO Users (Username, Password, Bio, AssignedProfilePic, Email)
+                        VALUES (${username}, ${password}, ${bio}, ${pfp}, ${email})
                         `, 
 
                         (err, data) => {
@@ -1496,10 +1490,10 @@ const Prior = ""
                                         return res.json(err)
                                 }
                                 else {
-                                        db.query(`
-                                                SELECT * 
+                                        db.query(`SELECT * 
                                                 FROM Users 
-                                                WHERE UserID = (SELECT MAX(A.UserID) FROM Users A)`,
+                                                ORDER BY UserID DESC
+                                                LIMIT 1`,
                                         (err, data) => {
                                                 if (err) {
                                                         return res.json(err)
@@ -1524,15 +1518,8 @@ const Prior = ""
                 const email = req.body.Email
                 const pfp = req.body.AssignedProfilePic
 
-                db.query(`
-                        INSERT INTO Users (UserID, Username, Password, Bio, Email, AssignedProfilePic)
-                        VALUES 
-                                ((SELECT MAX(A.UserID) + 1 FROM Users A), 
-                                ${username}, 
-                                ${password}, 
-                                "\'\'", 
-                                ${email}
-                                ${pfp})`, 
+                db.query(`INSERT INTO Users (Username, Password, Bio, Email, AssignedProfilePic)
+                        VALUES (${username}, ${password}, "\'\'", ${email}, ${pfp})`, 
 
                         (err, data) => {
                                 if (err) {
@@ -1540,11 +1527,10 @@ const Prior = ""
                                 }
                         }
                 );
-                db.query(`
-                        SELECT *
-                        FROM Users
-                        WHERE UserID = (SELECT MAX(A.UserID) FROM Users A
-                        )`,
+                db.query(`SELECT * 
+                        FROM Users 
+                        ORDER BY UserID DESC
+                        LIMIT 1`,
                         
                         (err, data) => {
                                 if (err) {

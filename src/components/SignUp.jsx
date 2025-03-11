@@ -94,25 +94,14 @@ const SubmitData = async (username, password, email) => {
       Preparing information for submission. Is very nice to structure
       everything in a nice json-like variable.
   */
-  const AddAccount = async (username, password, email) => {
+  const AddAccount = async (username, password, pic, email) => {
     try {
-      var rand = Math.floor(Math.random() * (3 - 1)) + 1
-      var pic;
-
-      if(rand == 1) {
-        pic = 'lemon-pfp.svg'
-      } else if (rand == 2) {
-        pic = 'lime-pfp.svg'
-      } else {
-        pic = 'orange-pfp.svg'
-      }
-
       var submission_json = {
         "Username": `\'${username}\'`, 
         "Password": `\'${password}\'`,
         "Bio": `\'Hey I\\'m ${username}!\'`,
+        "AssignedProfilePic":  `\'${pic}\'`,
         "Email": `\'${email}\'`,
-        "Pfp": pic,
       }
       var result = await axios.post(UsersInsertForward, submission_json)
       console.log("[AddAccount] result: ", result)
@@ -135,7 +124,18 @@ const SubmitData = async (username, password, email) => {
       else {
         console.log("Valid username!")
 
-        AddAccount(username, password, email)
+        var rand = Math.floor(Math.random() * (3 - 1)) + 1
+        var pic;
+
+        if(rand == 1) {
+          pic = 'lemon-pfp.svg'
+        } else if (rand == 2) {
+          pic = 'lime-pfp.svg'
+        } else {
+          pic = 'orange-pfp.svg'
+        }
+
+        AddAccount(username, password, pic, email)
           .then((result) => {
             console.log("Successful account creation!", result)
           })
