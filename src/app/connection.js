@@ -309,7 +309,7 @@ const Prior = ""
                 .get return: ARRAY[{"Timestamp": str, "Content": str, "Username": str, "Likes": int, "CommentCount": int]
         */
 
-        //Now shows correct username
+        //Now shows correct username, or anon when applicable. Like and comment counts were fixed
         app.get(PostsFetch10DescTimestamp, (req, res) => {
                 const offset = (req.query.page - 1) * 10
                 db.query(`

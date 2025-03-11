@@ -13,7 +13,7 @@ const Post = ({ body, date_time, display_name, pfp, num_likes, num_comments }) =
     return (
         <div id="post">
 
-            <div id="profile-pic"></div>
+            <img src={pfp} id="profile-pic"></img>
 
             <div className="right-section">
 
