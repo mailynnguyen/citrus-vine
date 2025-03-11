@@ -83,7 +83,7 @@ const PostModal = ({ onClick, setCreate }) => {
 
                 </div>
 
-                <button onClick={onClick} id="x">
+                <button onClick={onClick} id="x" data-testid="x-test">
                     <X color="#E1AB69" size={48}/>
                 </button>
             </div>
