@@ -625,7 +625,7 @@ const Prior = ""
                                 ${user_id}, 
                                 CURRENT_TIMESTAMP(), 
                                 '${content}', 
-                                ${anonymous}, 
+                                ${anonymous}
                         )`,
 
                         (err, data) => {
@@ -634,7 +634,7 @@ const Prior = ""
                                 }
                         }
                 );
-                /*db.query(`
+                db.query(`
                         INSERT INTO PostLikes (UserID, PostID, Likes)
                         VALUES (
                                 ${user_id}, 
@@ -666,7 +666,7 @@ const Prior = ""
                                         return res.json(data)
                                 }
                         }
-                )*/
+                )
         });
 
 

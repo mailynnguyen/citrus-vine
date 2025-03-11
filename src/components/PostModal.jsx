@@ -13,7 +13,7 @@ const PostModal = ({ onClick, setCreate }) => {
         UserID: 36,
         Content: "",
         Anonymous: anonymous,
-        Username: "mailyn"
+        //Username: "mailyn"
     })
 
     const handleAnon = (e) => {
