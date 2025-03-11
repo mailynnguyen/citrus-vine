@@ -117,16 +117,22 @@ const Prior = ""
 
         /*
                 .get parameters: [path: str] 
-                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+                .get return: ARRAY[{"Timestamp": str, "Content": str, "Username": str, "NumLikes": int, "NumComments": int, "UsedProfilePic": str]
         */
         app.get(PostsFetchAll, (req, res) => {
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
                         `, 
                         
                 (err, data) => {
@@ -147,13 +153,18 @@ const Prior = ""
 
                 const offset = (req.query.page - 1) * 10
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        ORDER BY A.Timestamp DESC
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
                         LIMIT 10 OFFSET ${offset}
                         `, 
                         
@@ -174,13 +185,19 @@ const Prior = ""
         */
         app.get(PostsFetchAscLikes, (req, res) => {
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        ORDER BY Likes ASC
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        ORDER BY NumLikes ASC
                         `), 
                 
                 (err, data) => {
@@ -200,13 +217,19 @@ const Prior = ""
         */
         app.get(PostsFetchDescLikes, (req, res) => {
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        ORDER BY Likes DESC
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        ORDER BY NumLikes DESC
                         `), 
                 
                 (err, data) => {
@@ -226,13 +249,19 @@ const Prior = ""
         */
         app.get(PostsFetchAscTimestamp, (req, res) => {
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        ORDER BY A.Timestamp ASC
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        ORDER BY P.Timestamp ASC
                         `, 
                         
                         (err, data) => {
@@ -253,13 +282,19 @@ const Prior = ""
         */
         app.get(PostsFetchDescTimestamp, (req, res) => {
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        ORDER BY A.Timestamp DESC
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        ORDER BY P.Timestamp DESC
                         `, 
                         
                         (err, data) => {
@@ -282,13 +317,19 @@ const Prior = ""
         app.get(PostsFetch10AscTimestamp, (req, res) => {
                 const offset = (req.query.page - 1) * 10
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        ORDER BY A.Timestamp ASC
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        ORDER BY P.Timestamp ASC
                         LIMIT 10 OFFSET ${offset}
                         `, 
                         
@@ -325,7 +366,6 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
-                        WHERE P.UserID = U.UserID
                         ORDER BY P.Timestamp DESC
                         LIMIT 10 OFFSET ${offset}
                         `, 
@@ -350,13 +390,12 @@ const Prior = ""
         app.post(PostsFetchOnPostID, (req, res) => {
                 const post_id = req.body.PostID
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        WHERE A.PostID = ${post_id}`,
+                        SELECT P.Timestamp, P.Content, U.Username, 
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                U.AssignedProfilePic as UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        WHERE P.PostID = ${post_id}`,
                         
                         (err, data) => {
                                 if (err) {
@@ -409,13 +448,13 @@ const Prior = ""
         app.post(PostsFetchOnUsername, (req, res) => {
                 const username = req.body.Username
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        WHERE A.Username = ${username}`,
+                        SELECT P.Timestamp, P.Content, U.Username, 
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                U.AssignedProfilePic as UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        CROSS JOIN (SELECT ${username} as Param) AS x
+                        WHERE P.UserID = U.UserID AND U.Username = x.Param AND P.Anonymous = 0`,
                         
                         (err, data) => {
                                 if (err) {
@@ -436,14 +475,14 @@ const Prior = ""
         app.post(PostsFetchAscTimestampOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        WHERE A.UserID = ${user_id}
-                        ORDER BY A.Timestamp ASC
+                        SELECT P.Timestamp, P.Content, U.Username, 
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                U.AssignedProfilePic as UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        CROSS JOIN (SELECT ${user_id} as Param) AS x
+                        WHERE P.UserID = x.Param AND U.UserID = x.Param AND P.Anonymous = 0
+                        ORDER BY P.Timestamp ASC
                         `,
                         
                         (err, data) => {
@@ -465,14 +504,14 @@ const Prior = ""
         app.post(PostsFetchDescTimestampOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        WHERE A.UserID = ${user_id}
-                        ORDER BY A.Timestamp DESC
+                        SELECT P.Timestamp, P.Content, U.Username, 
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                U.AssignedProfilePic as UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        CROSS JOIN (SELECT ${user_id} as Param) AS x
+                        WHERE P.UserID = x.Param AND U.UserID = x.Param AND P.Anonymous = 0
+                        ORDER BY P.Timestamp DESC
                         `,
                         
                         (err, data) => {
@@ -494,14 +533,14 @@ const Prior = ""
         app.post(PostsFetchAscLikesOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        WHERE A.UserID = ${user_id}
-                        ORDER BY Likes ASC
+                        SELECT P.Timestamp, P.Content, U.Username, 
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                U.AssignedProfilePic as UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        CROSS JOIN (SELECT ${user_id} as Param) AS x
+                        WHERE P.UserID = x.Param AND U.UserID = x.Param AND P.Anonymous = 0
+                        ORDER BY NumLikes ASC
                         `,
                         
                         (err, data) => {
@@ -523,14 +562,14 @@ const Prior = ""
         app.post(PostsFetchDescLikesOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        WHERE A.UserID = ${user_id}
-                        ORDER BY Likes DESC
+                        SELECT P.Timestamp, P.Content, U.Username, 
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                U.AssignedProfilePic as UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        CROSS JOIN (SELECT ${user_id} as Param) AS x
+                        WHERE P.UserID = x.Param AND U.UserID = x.Param AND P.Anonymous = 0
+                        ORDER BY NumLikes DESC
                         `,
                         
                         (err, data) => {
@@ -556,7 +595,7 @@ const Prior = ""
                 const anonymous = req.body.Anonymous
                 const username = req.body.Username
 
-                db.query(`
+                /*db.query(`
                         INSERT INTO PostLikes (UserID, PostID, Likes)
                         VALUES (
                                 ${user_id}, 
@@ -569,7 +608,7 @@ const Prior = ""
                                         return res.json(err)
                                 }
                         }
-                );
+                );*/
 
                 db.query(`
                         INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
@@ -589,7 +628,7 @@ const Prior = ""
                         }
                 );
 
-                db.query(`
+                /*db.query(`
                         SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
                         CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
                         CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
@@ -607,7 +646,7 @@ const Prior = ""
                                         return res.json(data)
                                 }
                         }
-                )
+                )*/
         });
 
 
@@ -635,7 +674,7 @@ const Prior = ""
                                 }
                         }
                 );
-                db.query(`
+                /*db.query(`
                         INSERT INTO PostLikes (UserID, PostID, Likes)
                         VALUES (
                                 ${user_id}, 
@@ -667,7 +706,7 @@ const Prior = ""
                                         return res.json(data)
                                 }
                         }
-                )
+                )*/
         });
 
 
@@ -702,8 +741,8 @@ const Prior = ""
                 const user_id = req.body.UserID
                 const post_id = req.body.PostID
                 db.query(` 
-                        INSERT PostLikes (UserID, PostID, Likes)
-                        VALUES (${user_id}, ${post_id}, 1)
+                        INSERT PostLikes (UserID, PostID)
+                        VALUES (${user_id}, ${post_id})
                         `,
 
                         (err, data) => {
