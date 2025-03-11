@@ -2,14 +2,29 @@
 const express = require("express")
 const mysql = require("mysql2")
 const cors = require("cors");
+const session = require("express-session");
+//const MySQLStore = require("express-mysql-session");
+const MySQLStore = require("express-mysql-session")(session);
+const bcrypt = require("bcryptjs");
+const dotenv = require("dotenv");
+
 // const promise = require("mysql2/promise")
 const { M_PLUS_1 } = require("next/font/google");
 // const { DatabaseBackup } = require("lucide-react");
 
+dotenv.config();
+
 const app = express()
-app.use(cors());
+app.use(cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+        methods: "GET,POST,PUT,DELETE,OPTIONS",  
+    allowedHeaders: "Content-Type,Authorization"
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 // app.use(promise());
+app.options("*", cors());
 
 
 //Database Server
@@ -27,10 +42,23 @@ var db = mysql.createConnection({
   port,
 });
 
+    
+
 db.connect(function (err) {
   if (err) throw err;
   console.log(`Connected to db: ${hostname}:${port}!`);
 });
+
+const sessionStore = new MySQLStore({}, db);
+
+app.use(session({
+    key: "user_sid", 
+    secret: "your_secret_key", 
+    resave: false, 
+    saveUninitialized: false, 
+    store: sessionStore, 
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } 
+}));
 
 // db.query("SELECT 1+1").on("result", function (row) {
 //   console.log(row);
@@ -1389,6 +1417,30 @@ const Prior = ""
 
                 const UsersValidateAccount = Users + "/ValidateAccount"
                 const UsersDeleteAccount = Users + "/DeleteAccount"
+                const UsersLogout = Users + "/Logout"
+                const UsersSession = Users + "/Session"
+
+        app.get(UsersSession, (req, res) => {
+                console.log("Session Data:", req.session);
+
+                if (req.session.user) {
+                        res.json({ userID: req.session.user.id }); // Returns { id }
+                } else {
+                        res.status(401).json({ error: "Not authenticated" });
+                }
+        });
+
+
+        app.post(UsersLogout, (req, res) => {
+                req.session.destroy((err) => {
+                        if (err) {
+                                return res.json(err)
+                        } else {
+                                res.json({ message: "Logged out successfully" });
+                        }
+                });
+        });
+                    
 
         /*
                 .get parameters: [Path: str]
@@ -1875,21 +1927,54 @@ const Prior = ""
                 const username = req.body.Username
                 const password = req.body.Password
                 db.query(`
-                        SELECT COUNT(*) = 1 as Outcome
+                        SELECT userID
                         FROM Users
                         WHERE 
                                 Username = ${username}
                                 AND Password = ${password}
                         `,
                         
+                        /*
                         (err, data) => {
                                 if (err) {
                                         return res.json(err)
-                                }
-                                else {
-                                        return res.json(data)
+                                } else if (data.length === 0) {
+                                        return res.status(401).json({ error: "Invalid username or password" });
+                                        console.log("WEEEEE", data.length);
+                                } else {
+                                        req.session.user = { id: data[0].UserID };
+                                        req.session.save(() => { 
+                                                console.log("Session Set:", req.session.user); 
+                                                res.json({ userID: req.session.user.id });
+                                        });
                                 }
                         }
+                        */
+                       
+                        (err, data) => {
+                                if (err) {
+                                        console.error("Database Error:", err);
+                                        return res.status(500).json({ error: "Database error" });
+                                }
+                        
+                                if (data.length === 0) {
+                                        console.log("Invalid login attempt");
+                                        return res.status(401).json({ error: "Invalid username or password" });
+                                }
+                        
+                                req.session.user = { id: data[0].userID };  
+                                console.log("Session Before Save:", req.session);
+                        
+                                req.session.save((saveErr) => {  
+                                        if (saveErr) {
+                                        console.error("Session Save Error:", saveErr);
+                                        return res.status(500).json({ error: "Session save failed" });
+                                        }
+                                        console.log("Session After Save:", req.session);
+                                        res.json({ userID: req.session.user.id });
+                                });
+                        }
+                            
                 )
         });
 

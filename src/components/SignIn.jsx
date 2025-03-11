@@ -7,6 +7,8 @@ import CitrusBg from "../images/citrus-bg.jpeg";
 
 import axios from "axios";
 import { UsersValidateAccount } from "@/app/paths";
+import { UsersSession } from "@/app/paths";
+
 import Link from 'next/link'
 
 
@@ -22,9 +24,13 @@ function SignIn() {
             }
             console.log("Provided username: ", enteredUser)
             console.log("Provided password: ", enteredPassword)
-            var result = axios.post(UsersValidateAccount, submission)
-            console.log("[AttemptSignIn][Try]: ", result)
-            return result
+
+            const result = await axios.post(UsersValidateAccount, submission, { withCredentials: true });
+            console.log("[AttemptSignIn][Try]: ", result.data)
+
+            const res =  await axios.get(UsersSession, { withCredentials: true });
+            console.log("User's ID: " , res.data)
+            return res.data
         }
         catch(err) {
             console.log("Error: ", err)
@@ -32,18 +38,19 @@ function SignIn() {
     }
     const ClickSignIn = (enteredUsername, enteredPassword) => {
         AttemptSignIn(enteredUsername, enteredPassword)
-            .then((result) => {
-            var valid = result.data[0].Outcome
-            console.log("[AttemptSignIn][.then]: ", valid)
+            .then((userSession) => {
+            if(!userSession ){
+                alert("Invalid username or password.");
+                return;
+            }
+            console.log("[AttemptSignIn][.then]: ", userSession)
 
-            if (valid) {
+            if (userSession) {
                 console.log("Successful sign in!")
+                //console.log(req.session.user.id)
                 /*
                     Potentially insert routing process here.
                 */
-            }
-            else {
-                alert("Invalid username or password.")
             }
         })
     }
