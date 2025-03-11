@@ -1433,14 +1433,17 @@ const Prior = ""
                 const password = req.body.Password
                 const bio = req.body.Bio
                 const email = req.body.Email
+                const pfp = req.body.AssignedProfilePic
+
                 db.query(`
-                        INSERT INTO Users (UserID, Username, Password, Bio, Email)
+                        INSERT INTO Users (UserID, Username, Password, Bio, Email, AssignedProfilePic)
                         VALUES (
                                 ${user_id}, 
                                 ${username}, 
                                 ${password}, 
                                 ${bio}, 
-                                ${email})`, 
+                                ${email}
+                                ${pfp})`, 
 
                         (err, data) => {
                                 if (err) {
@@ -1475,15 +1478,17 @@ const Prior = ""
                 const password = req.body.Password
                 const bio = req.body.Bio
                 const email = req.body.Email
+                const pfp = req.body.AssignedProfilePic
 
                 db.query(`
-                        INSERT INTO Users (UserID, Username, Password, Bio, Email)
+                        INSERT INTO Users (UserID, Username, Password, Bio, Email, AssignedProfilePic)
                         VALUES 
                                 ((SELECT MAX(A.UserID) + 1 FROM Users A), 
                                 ${username}, 
                                 ${password}, 
                                 ${bio}, 
-                                ${email})
+                                ${email}),
+                                ${pfp}
                         `, 
 
                         (err, data) => {
@@ -1517,15 +1522,17 @@ const Prior = ""
                 const username = req.body.Username
                 const password = req.body.Password
                 const email = req.body.Email
+                const pfp = req.body.AssignedProfilePic
 
                 db.query(`
-                        INSERT INTO Users (UserID, Username, Password, Bio, Email)
+                        INSERT INTO Users (UserID, Username, Password, Bio, Email, AssignedProfilePic)
                         VALUES 
                                 ((SELECT MAX(A.UserID) + 1 FROM Users A), 
                                 ${username}, 
                                 ${password}, 
                                 "\'\'", 
-                                ${email})`, 
+                                ${email}
+                                ${pfp})`, 
 
                         (err, data) => {
                                 if (err) {
@@ -1555,12 +1562,13 @@ const Prior = ""
                 .post paramters: [Path: str, {"Username": str}]
                 .post return: [{"Existence": bool}]
         */
+
+        /*Noticed this wasn't working, research suggests sql can simply be weird abt bools?*/
+
         app.post(UsersCheckUsernameExists, (req, res) => {
                 const username = req.body.Username
                 db.query(`
-                        SELECT COUNT(*) > 0 as Existence
-                        FROM Users
-                        WHERE Username = ${username}
+                        select if(Username = ${username}, true, false) as Existence from Users;
                         `,
                 
                         (err, data) => {
@@ -1583,9 +1591,7 @@ const Prior = ""
         app.post(UsersCheckEmailExists, (req, res) => {
                 const email = req.body.Email
                 db.query(`
-                        SELECT COUNT(*) > 0 as Existence
-                        FROM Users
-                        WHERE Email = ${email}
+                        select if(Email = ${email}, true, false) as Existence from Users;
                         `,
                 
                         (err, data) => {

@@ -96,11 +96,23 @@ const SubmitData = async (username, password, email) => {
   */
   const AddAccount = async (username, password, email) => {
     try {
+      var rand = Math.floor(Math.random() * (3 - 1)) + 1
+      var pic;
+
+      if(rand == 1) {
+        pic = 'lemon-pfp.svg'
+      } else if (rand == 2) {
+        pic = 'lime-pfp.svg'
+      } else {
+        pic = 'orange-pfp.svg'
+      }
+
       var submission_json = {
         "Username": `\'${username}\'`, 
         "Password": `\'${password}\'`,
         "Bio": `\'Hey I\\'m ${username}!\'`,
         "Email": `\'${email}\'`,
+        "Pfp": pic,
       }
       var result = await axios.post(UsersInsertForward, submission_json)
       console.log("[AddAccount] result: ", result)
