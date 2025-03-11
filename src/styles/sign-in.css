@@ -1,0 +1,136 @@
+@import url("https://fonts.googleapis.com/css?family=Indie Flower");
+
+#bg-holder {
+    background-color: #7CA7E1;
+    background-image: url("../images/citrus-bg.jpeg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+    margin: 0%;
+    padding: 0%;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    margin-top: 3%;
+}
+
+input {
+    color: black;
+}
+
+.input-text {
+    background-color: #D9D9D9;
+    color: black;
+    display: block;
+    font-size: 1.1rem;
+    margin: 5% 0;
+    padding: 4%;
+    position: relative;
+}
+
+input[type=submit]:hover {
+    cursor: pointer;
+}
+
+input::placeholder {
+    color: #202020;
+    opacity: 1; 
+}
+  
+input::-ms-input-placeholder { 
+    color: #969696;
+}
+
+input:focus::placeholder {
+    color: #969696;
+    opacity: 1; 
+}
+
+input:focus::-ms-input-placeholder { 
+    color: #969696;
+}
+
+.input-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center; 
+    align-items: center; 
+    width: 100%;
+    margin-bottom: 5%;
+}
+
+.line-with-text {
+    display: flex;
+    align-items: center;  
+    justify-content: center; 
+    width: 35%; 
+    text-align: center;
+    margin: 0 auto;
+    position: relative;
+}
+
+.line-with-text::before,
+.line-with-text::after {
+    content: '';
+    flex: 1;
+    border-top: 2px solid #D9D9D9;  
+    margin: 0 10px;
+}
+
+.line-text {
+    position: relative;
+    padding: 0 10px; 
+    color: #D9D9D9; 
+    font-weight: bold;
+}
+
+.sign-in-button {
+    background-color: #D9D9D9;
+    color: #202020;
+    margin: 3% auto;
+    border-radius: 1rem;
+    width: 70%;
+    padding: 1%;
+    font-size: .9rem;
+    transition: background-color 0.3s ease;
+}
+
+.sign-in-button:hover {
+    background-color: #52a6ff;
+    color: #FFFFFF;
+}
+
+.sign-in-form, #alt-sign-in {
+    display: flex;
+    flex-direction: column;
+    width: max(25%, 350px);
+    margin: 0 auto;
+    padding: 3%;
+}
+
+.sign-in-text {
+    display: block;
+    font-size: 3rem;
+    font-family: 'Indie Flower';
+    text-align: center;
+    margin-top: 1%;
+    color: white;
+    pointer-events: none;
+    user-select: none;
+}
+
+.citrus-vine-text {
+    display: block;
+    font-size: 6rem;
+    font-family: 'Indie Flower';
+    text-align: center;
+    margin-top: 6%;
+    color: white;
+    pointer-events: none;
+    user-select: none;
+}
+

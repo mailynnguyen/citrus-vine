@@ -1,193 +1,179 @@
 "use client";
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from "lucide-react";
+import axios from 'axios';
 import "../styles/sign-up.css";
 
-// React
-import { useState, useEffect } from 'react'
-import { User } from "lucide-react";
-
-// Images
-import PusheenImage from "../images/pusheen-background-upscaled-dimmed.png"
-import CitrusVineLogo from "../images/BearCutie Logo.svg"
-
-// DB
-import { UsersInsertForward, UsersCheckUsernameExists} from "@/app/paths";
-import axios from "axios";
 
 
-const InputField = ({fieldName, fieldPlaceHolder, fieldWidth, setUsername, setPassword, setEmail}) => {
+const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onChange}) => {
+    const [showPassword, setShowPassword] = useState(false);
 
-  const [fieldValue, setFieldValue] = useState("")
-
-  var textConfig = "sign-up-input"
-  if (fieldValue != "") {
-    console.log("Filled")
-    textConfig = "sign-up-input-filled"
-  } 
-  else {
-    console.log("Unfilled")
-  }
-  
-  const onFieldValueChange = (event) => {
-    var value = event.target.value
-    setFieldValue(event.target.value)
-    if (fieldName == "Username") {setUsername(value)}
-    if (fieldName == "Password") {setPassword(value)}
-    if (fieldName == "Email") {setEmail(value)}
-  }
-
-  return (
-    <div className="input-field" style={{width:`${fieldWidth}`}}>
-      <div className="sign-up-text">{fieldName}</div>
-
-      <input 
-        value={fieldValue} 
-        placeholder={fieldPlaceHolder} 
-        type="text" 
-        onChange={onFieldValueChange} 
-        className={textConfig}/>  
-
-    </div>
-  )
+    return (
+        <div style={{ position: "relative", display: "inline-block" }}>
+            <div className="sign-up-text" style={{ fontWeight: "bold", color: "white" }}>{fieldName}</div>
+            <input 
+                value={value} 
+                placeholder={fieldPlaceHolder} 
+                type={type === "password" && !showPassword ? "password" : "text"} // Toggle visibility
+                onChange={onChange} 
+                style={{ 
+                    width: `${fieldWidth}`, 
+                    height: "30px", 
+                    borderRadius: "10px", 
+                    paddingLeft: "10px", 
+                    paddingRight: "35px" // Space for the eye icon 
+                }} 
+            />  
+            {type === "password" && (
+                <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    style={{ 
+                        position: "absolute", 
+                        right: "10px", 
+                        top: "70%", 
+                        transform: "translateY(-50%)",
+                        background: "none", 
+                        border: "none", 
+                        cursor: "pointer",
+                        color: "black"
+                    }}
+                >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+            )}
+        </div>
+    );
 }
 
-const Button = ({buttonText, buttonAction}) => {
+
+function SignUp() {
+  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+  const [firstName, enterFirstName] = useState("");
+  const [lastName, enterLastName] = useState("");
+  const [username, enterUsername] = useState("");
+  const [password, enterPassword] = useState("");
+  const [email, enterEmail] = useState("");
+
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Redirect to sign-in page when "Have an account?" button is clicked.
+  const handleSignIn = () => {
+    router.push('/');
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!firstName || !lastName || !username || !password || !email) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:3307/api/auth/signup', {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: username.trim(),
+        password: password.trim(),
+        email: email.trim(),
+      });
+
+      if (response.status == 200) {
+        console.log(response.data);
+        console.log('Sign-up Successful!');
+        router.push('/home');
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("An error occured while signing up. Please try again.");
+      }
+    }
+  }
+
+  // if (isClient) return null;
+
   return (
     <div>
-      <button onClick={buttonAction} className="sign-up-button">{buttonText}</button>
+        <div className="title-container">
+          <div className="citrus-vine-title">Citrus Vine</div>
+          <div className='sign-up-title'>Sign Up</div>
+        </div>
+        
+        <form className="sign-up-form" onSubmit={handleSubmit}>
+          <div className='input-row'>
+            <InputField 
+                fieldName="First Name"
+                type="text"
+                id="firstNameEntry"
+                className="input-text" 
+                fieldPlaceHolder="ex: John" 
+                value={firstName} 
+                onChange={(e) => enterFirstName(e.target.value)}
+            />
+            <InputField 
+                fieldName="Last Name"
+                type="text"
+                id="lasttNameEntry"
+                className="input-text" 
+                fieldPlaceHolder="ex: Doe" 
+                value={lastName} 
+                onChange={(e) => enterLastName(e.target.value)}
+            />
+          </div>
+          <div className='input-row'>
+            <InputField 
+                fieldName="Username"
+                type="text"
+                id="userEntry"
+                className="input-text" 
+                fieldPlaceHolder="ex: DoeBoy_123" 
+                value={username} 
+                onChange={(e) => enterUsername(e.target.value)}
+            />
+            <InputField 
+                fieldName="Password"
+                type="password" 
+                id="passwordEntry" 
+                className="input-text" 
+                fieldPlaceHolder="Enter here" 
+                value={password} 
+                onChange={(e) => enterPassword(e.target.value)}
+            />
+          </div>
+          <div className='input-row'>
+            <InputField 
+                fieldName="Email"
+                type="text" 
+                id="emailEntry" 
+                className="email-container" 
+                fieldPlaceHolder="ex: jdoe001@ucr.edu" 
+                fieldWidth="400px"
+                value={email} 
+                onChange={(e) => enterEmail(e.target.value)}
+            />
+          </div>
+          <input 
+              type="submit" 
+              value="Sign Up" 
+              className="sign-up-button"
+          />
+        </form>
+
+        <div id="alt-sign-in">
+          <button className="sign-up-button" onClick={handleSignIn}>Have have an account?</button>
+        </div>
     </div>
-  )
-}
-
-const SubmitData = async (username, password, email) => {
-
-  /*
-      Prevent alert spam on refresh by having this base case exist.
-  */
-  if (username == "" || password == "" || email == "") {
-    return;
-  }
-  console.log(`Given username: ${username}`)
-  console.log(`Given password: ${password}`)
-  console.log(`Given email: ${email}`)
-
-
-  /*
-      Checks whether the username specified already exists. UserID is primary
-      key but it would also just be weird for two accounts to have the same 
-      username.
-  */
-  var doesExist = {"exists": false}
-  const CheckExists = async (username, doesExist) => {
-    try{
-      var result = await axios.post(UsersCheckUsernameExists, {"Username": `\'${username}\'`})
-      console.log("[CheckExists] result: ", result)
-      doesExist.exists = result.data[0].Existence
-      return result;
-    }
-    catch (err) {
-      console.log("Error: ", err)
-    }
-  }    
-
-
-  /*
-      Preparing information for submission. Is very nice to structure
-      everything in a nice json-like variable.
-  */
-  const AddAccount = async (username, password, email) => {
-    try {
-      var submission_json = {
-        "Username": `\'${username}\'`, 
-        "Password": `\'${password}\'`,
-        "Bio": `\'Hey I\\'m ${username}!\'`,
-        "Email": `\'${email}\'`,
-      }
-      var result = await axios.post(UsersInsertForward, submission_json)
-      console.log("[AddAccount] result: ", result)
-      return result;
-    }
-    catch (err) {
-      console.log("Error: ", err)
-    }
-  }
-
-  CheckExists(username, doesExist)
-    .then((result) => {
-
-      console.log("result: ", result.data[0].Existence)
-      const does_username_exist = result.data[0].Existence;
-      doesExist = result.data[0].Existence
-      if (does_username_exist) {
-        alert("Invalid username. Username already exists!")
-      }
-      else {
-        console.log("Valid username!")
-
-        AddAccount(username, password, email)
-          .then((result) => {
-            console.log("Successful account creation!", result)
-          })
-      }
-    })
-}
-
-const SignUp = () => {
-
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [email, setEmail] = useState("")
-
-  console.log("\n")
-  console.log("Username: ", username)
-  console.log("Password: ", password)
-  console.log("Email: ", email)
-
-  return (
-    <section id="sign-up-background" style ={{backgroundImage: `url(${PusheenImage.src})`}}>
-
-      <div className="sign-up-title">Sign Up</div><br></br>
-      <img src={CitrusVineLogo.src} className="sign-up-citrus-vine-logo"></img>
-      
-      <div className="sign-up-field-container">
-        {/*  
-          First name and last name fields deemed unnecessary for now
-          due to the amount of overhead refactoring would bring to 
-          connection.js
-        */}
-        {/* 
-        <InputField fieldName="First Name" fieldPlaceHolder="Enter first name..."/>
-        <InputField fieldName="Last Name" fieldPlaceHolder="Enter last name..."/> 
-        */}
-
-        <InputField fieldName="Username" 
-          fieldPlaceHolder="Enter user name..." 
-          setUsername={setUsername}
-          setPassword={setPassword}
-          setEmail={setEmail}
-        />
-        <InputField fieldName="Password" 
-          fieldPlaceHolder="Enter password..."
-          setUsername={setUsername}
-          setPassword={setPassword}
-          setEmail={setEmail}
-        />
-        <InputField fieldName="Email" 
-          fieldPlaceHolder="Enter email..." 
-          fieldWidth="100%"
-          setUsername={setUsername}
-          setPassword={setPassword}  
-          setEmail={setEmail}
-        />
-      </div>
-
-      <div className="sign-up-button-container">
-        <Button buttonText="Create Account " 
-          buttonAction={() => SubmitData(username, password, email)}
-        />
-      </div>
-
-    </section>
-
   )
 }
 
