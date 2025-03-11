@@ -50,6 +50,12 @@ const Posts = ({collectedText}) => {
             console.log("Filtering...")
             var filteredPosts = []
             for (var i = 0, post; i < original_posts.length, post = original_posts[i]; ++i) {
+                console.log("[filterText]: ", filterText)
+                console.log("[post.Content]: ", post.Content)
+                console.log("[post.Username]: ", post.Username)
+                if (post.Username == null || post.Content == null) {
+                    continue;
+                }
                 if (post.Content.includes(filterText) || post.Username.includes(filterText)) {
                     console.log("Found a non-filtered post")
                     filteredPosts.push(post)
