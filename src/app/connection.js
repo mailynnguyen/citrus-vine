@@ -383,8 +383,9 @@ const Prior = ""
                 const user_id = req.body.UserID
                 db.query(`
                         SELECT P.Timestamp, P.Content, U.Username, 
-                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.UserID = U.UserID AND Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.UserID = U.UserID AND Cl.CommentID = C.CommentID) AS NumComments
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
                         CROSS JOIN (SELECT ${user_id} as Param) AS x
                         WHERE P.UserID = x.Param AND U.UserID = x.Param AND P.Anonymous = 0
