@@ -306,18 +306,27 @@ const Prior = ""
         
         /*
                 .get parameters: [Path: str]
-                .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+                .get return: ARRAY[{"Timestamp": str, "Content": str, "Username": str, "Likes": int, "CommentCount": int]
         */
+
+        //Now shows correct username
         app.get(PostsFetch10DescTimestamp, (req, res) => {
                 const offset = (req.query.page - 1) * 10
                 db.query(`
-                        SELECT A.PostID, A.UserID, A.Timestamp, A.Content, A.Anonymous, A.Username, 
-                        CASE WHEN Likes IS NULL THEN 0 ELSE Likes END AS Likes, 
-                        CASE WHEN CommentCount IS NULL THEN 0 ELSE CommentCount END AS CommentCount
-                        FROM Posts A
-                        LEFT JOIN (SELECT C.PostID, COUNT(*) as CommentCount FROM Comments C GROUP BY C.PostID) as C ON A.PostID = C.PostID 
-                        LEFT JOIN PostLikes B ON A.PostID = B.PostID
-                        ORDER BY A.Timestamp DESC
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
+                        ORDER BY P.Timestamp DESC
                         LIMIT 10 OFFSET ${offset}
                         `, 
                         
@@ -609,17 +618,14 @@ const Prior = ""
                 const user_id = req.body.UserID
                 const content = req.body.Content
                 const anonymous = req.body.Anonymous
-                const username = req.body.Username
                 
                 db.query(`
-                        INSERT INTO Posts (PostID, UserID, Timestamp, Content, Anonymous, Username) 
+                        INSERT INTO Posts (UserID, Timestamp, Content, Anonymous) 
                         VALUES (
-                                (SELECT MAX(A.PostID) + 1 FROM Posts A), 
                                 ${user_id}, 
                                 CURRENT_TIMESTAMP(), 
                                 '${content}', 
                                 ${anonymous}, 
-                                '${username}'
                         )`,
 
                         (err, data) => {
@@ -628,7 +634,7 @@ const Prior = ""
                                 }
                         }
                 );
-                db.query(`
+                /*db.query(`
                         INSERT INTO PostLikes (UserID, PostID, Likes)
                         VALUES (
                                 ${user_id}, 
@@ -660,7 +666,7 @@ const Prior = ""
                                         return res.json(data)
                                 }
                         }
-                )
+                )*/
         });
 
 

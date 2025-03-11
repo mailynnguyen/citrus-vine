@@ -83,6 +83,9 @@ const Posts = ({collectedText}) => {
                         body={post.Content}
                         display_name={post.Username}
                         date_time={new Date(post.Timestamp).toISOString().slice(0, 19).replace('T', ' ')} // doing the splice b/c instance of Date
+                        pfp={post.UsedProfilePic}
+                        num_likes={post.NumLikes}
+                        num_comments={post.NumComments}
                     />
             ))}
 

@@ -5,7 +5,7 @@ import { MessageCircle } from "lucide-react";
 import '@/styles/post.css';
 
 
-const Post = ({ body, date_time, display_name }) => {
+const Post = ({ body, date_time, display_name, pfp, num_likes, num_comments }) => {
 
     const [like, setLike] = useState(false);
 
@@ -32,12 +32,12 @@ const Post = ({ body, date_time, display_name }) => {
                                 ? <Heart className="heart" id="heart-filled" onClick={() => setLike(!like)} fill="#BE4A31" strokeWidth={0} />
                                 : <Heart className="heart" id="heart-outline" onClick={() => setLike(!like)} strokeWidth={1.3} color="#878787" />
                             }
-                            <p id="like-count">0</p>
+                            <p id="like-count">{num_likes}</p>
                     </div>
 
                     <div className="post-comment-button">
                         <MessageCircle className="comment-button" />
-                        <p id="comment-count">0</p>
+                        <p id="comment-count">{num_comments}</p>
                     </div>
 
                 </div>
