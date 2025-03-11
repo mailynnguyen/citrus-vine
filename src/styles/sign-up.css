@@ -51,7 +51,7 @@ input[type=submit]:hover {
 }
 
 .sign-up-background {
-  background-image: url(../images/pusheen-background-upscaled.png);
+  background-image: url('../images/citrus-bg.jpeg');
   background-size: "cover";
   background-repeat: "repeat";
   background-position: "center";

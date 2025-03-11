@@ -1,18 +1,17 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Search } from "lucide-react";
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import '@/styles/sign-in.css';
+import { UsersFetchAll } from "@/app/paths";
 
 
 const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onChange}) => {
-    // const [fieldValue, setFieldValue] = useState("")
     const [showPassword, setShowPassword] = useState(false);
 
-    // const onFieldValueChange = event => {
-    //   setFieldValue(event.target.value)
-    // }
     return (
         <div style={{ position: "relative", display: "inline-block" }}>
             <div className="sign-up-text" style={{ fontWeight: "bold", color: "white" }}>{fieldName}</div>
@@ -44,7 +43,7 @@ const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onCha
                         color: "black"
                     }}
                 >
-                    {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
             )}
         </div>
@@ -63,6 +62,29 @@ function SignIn() {
     useEffect(() => {
         setIsClient(true); // Mark as client-side rendered after initial render
     }, []);
+
+
+    const googleLogin = async (userData) => {
+        console.log("UserData:", userData);
+        try {
+            const saveUserResponse = await axios.post('http://localhost:3307/api/auth/googleSignIn', userData);
+            console.log('Save user response:', saveUserResponse);
+
+            if (saveUserResponse.status === 200) {
+                console.log(saveUserResponse.data);
+                console.log('Google sign-in successful!');
+                router.push('/home');
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("An error occurred while signing in with Google. Please try again.");
+            }
+        }
+    }
 
     // Redirect to sign-up page when "Dont have an account?" button is clicked.
     const handleSignUp = () => {
@@ -83,7 +105,7 @@ function SignIn() {
                 password: password.trim(),
             });
 
-            if (response.status == 200) {
+            if (response.status === 200) {
                 console.log(response.data);
                 console.log("Sign-in Successful!");
                 router.push('/home');
@@ -91,7 +113,6 @@ function SignIn() {
                 alert(`Error: ${data.message}`);
             }
         } catch (error) {
-            // console.error("Sign-in error:", error);
             if (error.response) {
                 alert(error.response.data.message);
             } else {
@@ -139,10 +160,27 @@ function SignIn() {
                 <span className="line-text">OR</span>
             </div>
 
-            <div id="alt-sign-in">
-                <button className="sign-in-button">Sign in with Google</button>
-            </div>
+            <div className='button-container'>
+                <GoogleLogin
+                    onSuccess={credentialResponse => {
+                        const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
+                        // console.log(credentialResponseDecoded);
+                        const userData = {
+                            email: credentialResponseDecoded.email,
+                            name: credentialResponseDecoded.name,
+                            picture: credentialResponseDecoded.picture,
+                            given_name: credentialResponseDecoded.given_name,
+                            family_name: credentialResponseDecoded.family_name,
+                        };
 
+                        googleLogin(userData);
+                    }}
+                    onError={() => {
+                        console.log('Google Login Failed');
+                    }}
+                />
+            </div>
+            
             <div id="alt-sign-in">
                 <button className="sign-in-button" onClick={handleSignUp}>Don't have an account?</button>
 

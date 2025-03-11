@@ -1,17 +1,17 @@
 // App Initialization
 
 import express from 'express';
-import mysql from 'mysql2';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import mysql from 'mysql2';
 import passport from 'passport';
 import session from 'express-session';
-import GoogleStrategy from 'passport-google-oauth20';
-import { M_PLUS_1 } from "next/font/google";
-// const GoogleStrategy = require('passport-google-oauth20').Strategy;
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
+dotenv.config();
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 
 
@@ -22,7 +22,7 @@ var port = "3307";
 var username = "CitrusVineDB_oxygenbend";
 var password = "51eb7f921a83851a80e14c57d7c81c80624c1c12";
 
-var db = mysql.createConnection({
+const db = mysql.createConnection({
         host: hostname,
         user: username,
         password,
@@ -32,8 +32,10 @@ var db = mysql.createConnection({
 
 db.connect(function (err) {
         if (err) throw err;
-        console.log(`Connected to db: ${hostname}:${port}!`);
+        console.log(`Connected to db: ${hostname}:${port}`);
 });
+
+export default db;
 
 // Web server
 app.listen(3307, () => {
@@ -45,19 +47,19 @@ app.listen(3307, () => {
 ----------------------------- AUTHENTCATION & AUTHORIZATION -----------------------------
 */
 
-// const signInRoute = require('./api/auth/signin');
 import signInRoute from './api/auth/signin.js';
-app.use('/api/auth', signInRoute);
-
 import signUpRoute from './api/auth/signup.js';
-app.use('/api/auth', signUpRoute);
+import googleSignInRoute from './api/auth/googleSignIn.js';
 
+app.use('/api/auth', signInRoute);
+app.use('/api/auth', signUpRoute);
+app.use('/api/auth', googleSignInRoute);
       
 /*
 -----------------------------  Routers -----------------------------
 */
-const userQueryRouter = require('./query-routes/users')
-app.use('/UsersQuery', userQueryRouter)
+import userQueryRouter from './query-routes/users.js';
+app.use('/UsersQuery', userQueryRouter);
 
 
 /*
@@ -2158,5 +2160,3 @@ const Prior = ""
                         }
                 });
         });
-
-export default db;

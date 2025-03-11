@@ -1,8 +1,8 @@
 "use client"
-import SignUp from '../../components/SignUp';
+import Feed from "../../components/Feed";
 import React, { useState } from "react";
 
 
 export default function App() {
-    return <SignUp />;
+    return <Feed />;
 }

@@ -52,9 +52,6 @@ app.get('/', (req, res) => {
 app.get('/auth/google', passport.authenticate('google', { scope: ["profile", "email"] })
 );
 
-// app.get('/auth/google/callback', passport.authenticate('google', {failureRedirect: '/'}), (req, res) => {
-//         res.redirect('/profile')
-// });
 app.get('/auth/google/callback', (req, res, next) => {
     passport.authenticate('google', (err, user, info) => {
         if (!user) {
