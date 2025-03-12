@@ -40,6 +40,7 @@ const Feed = () => {
       }
       setRefresh("refresh")
       console.log("[Feed][Action] Create was changed.")
+      setCollectedText("");
     }, [create])
   
     return (

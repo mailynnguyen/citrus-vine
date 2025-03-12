@@ -50,7 +50,6 @@ const PostModal = ({ onClick, setCreate}) => {
               console.log("hello")
               console.log("post created: ", res.data)
               // refreshFeed("");
-              setCreate(false)
             })
 
         } catch (err) {

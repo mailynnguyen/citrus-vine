@@ -22,14 +22,14 @@ const Posts = ({collectedText, refresh_value}) => {
     const [filterText, setFilterText] = useState("")
     const [showMoreAvailable, setShowMoreAvailable] = useState(true)
 
-    // const isMounted = useRef(false)
+    const isMounted = useRef(false)
     useEffect(() => {
-        // if (!isMounted.current) {
-        //     isMounted.current = true;
-        //     return;
-        // }
+        if (!isMounted.current) {
+            isMounted.current = true;
+            return;
+        }
         console.log("[Posts][Refresh]")
-        setFilterText(filterText)
+        setFilterText("")
     }, [refresh])
 
     console.log("filterText: ", filterText)
@@ -200,7 +200,7 @@ const Posts = ({collectedText, refresh_value}) => {
         // ogFetchAllPosts();
         // fetchAllPosts();
         setPage(page + 1);
-        if (original_posts.legnth >= totalNumPosts) {
+        if (original_posts.length >= totalNumPosts) {
             setShowMoreAvailable(false)
         }
         else {
