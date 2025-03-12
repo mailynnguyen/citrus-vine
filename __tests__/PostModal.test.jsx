@@ -6,6 +6,9 @@ import PostModal from '@/components/PostModal'
 import axios from "axios"
 
 jest.mock("axios")
+jest.mock('lucide-react', () => ({
+    X: () => <div>Mock X Icon</div>,
+}));
 
 describe('PostModal', () => {
 
