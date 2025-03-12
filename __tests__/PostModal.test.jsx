@@ -25,10 +25,10 @@ describe('PostModal', () => {
         render(<PostModal onClick={mockOnClick} setCreate={() => {}} />)
 
         // ACT
-        await userEvent.click(screen.getByText("Anonymous ON"))
+        await userEvent.click(screen.getByText("Anonymous is OFF"))
 
         // ASSERT
-        expect(screen.getByText("Anonymous OFF")).toBeInTheDocument()
+        expect(screen.getByText("Anonymous is ON")).toBeInTheDocument()
     })
 
     it('closes the post-modal correctly', async () => {
@@ -61,10 +61,10 @@ describe('PostModal', () => {
         expect(axios.post).toHaveBeenCalledWith(
             'http://localhost:3307/Posts/InsertForward',
             {
-                UserID: 1,
+                UserID: 36,
                 Content: '',
                 Anonymous: false,
-                Username: 'mailyn',
+                // Username: 'mailyn',
             }
         )
         expect(mockSetCreate).toHaveBeenCalledWith(false)
