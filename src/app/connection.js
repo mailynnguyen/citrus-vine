@@ -1957,7 +1957,7 @@ const Prior = ""
                                         return res.status(500).json({ error: "Database error" });
                                 }
                         
-                                if (data.length === 0) {
+                                if (data < 0) {
                                         console.log("Invalid login attempt");
                                         return res.status(401).json({ error: "Invalid username or password" });
                                 }
