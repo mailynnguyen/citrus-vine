@@ -1,7 +1,7 @@
 #section {
-    position: fixed;
+    /*position: fixed;
     top: 0;
-    right: 0;
+    right: 0;*/
     width: max(20%, 200px);
     padding: 2%;
     height: 100vh;

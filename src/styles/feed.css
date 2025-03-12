@@ -1,0 +1,8 @@
+.holder {
+    display: flex;
+}
+
+.left {
+    flex-grow: 4;
+    width: 50%;
+}

@@ -1,12 +1,14 @@
 .search-form {
-    width: 600px;
+    /*width: 600px;*/
+    width: 50vw;
     position: relative;
+    margin: 0 auto;
 }
 
 .search-container {
     position: relative;
-    top: 20px;
-    left: 500px;
+    /*top: 20px;
+    left: 500px;*/
 }
 
 .search-input {

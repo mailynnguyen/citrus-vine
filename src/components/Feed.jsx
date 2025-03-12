@@ -8,6 +8,8 @@ import SideBar from "./SideBar"
 import Posts from "./Posts"
 import PostModal from "./PostModal"
 
+import '@/styles/feed.css';
+
 const Feed = () => {
 
     const [refresh, setRefresh] = useState("")
@@ -44,13 +46,13 @@ const Feed = () => {
     }, [create])
   
     return (
-      <div>
-        <div key={create}>
+      <div class="holder">
+        <div key={create} class="left">
           <SearchBar sendText = {setCollectedText}/>
           <Posts collectedText={collectedText} refresh_value={refresh}/>
         </div>
         
-        <SideBar onClick={handleOpen}/>
+        <SideBar onClick={handleOpen} class="right"/>
   
         {create ? <PostModal onClick={handleClose} setCreate={setCreate}/> : ""}
       </div>
