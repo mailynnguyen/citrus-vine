@@ -15,6 +15,7 @@
 .display-bio-holder {
     /*margin-right: 8%;*/
     padding: 3%;
+    flex-grow: 4;
 }
 
 .display-name {
