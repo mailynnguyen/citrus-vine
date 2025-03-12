@@ -19,6 +19,9 @@
         npm i mysql2
         npm i cors
         npm i lucide-react
+        npm i -g concurrently
+        npm i passport
+        npm i express-mysql-session
 
         # Extensions
                 # MySQL Shell for VS Code
