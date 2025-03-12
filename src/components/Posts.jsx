@@ -43,9 +43,11 @@ const Posts = ({collectedText, refresh_value}) => {
 
     const getTotalNumberPosts = async() => {
         try {
-            const res = await axios.get(`http://localhost:3307/Posts/GetTotalPosts`)
-            console.log("Called [getTotalNumberPosts()]: ", res.data[0].NumPosts)
-            setTotalNumPosts(res.data[0].NumPosts)
+            const res = axios.get(`http://localhost:3307/Posts/GetTotalPosts`).then((result) => {
+                console.log("Called [getTotalNumberPosts()]: ", result.data[0].NumPosts)
+                setTotalNumPosts(result.data[0].NumPosts)
+            })
+            
         } catch (err) {
             console.log(err)
         } 
@@ -84,11 +86,13 @@ const Posts = ({collectedText, refresh_value}) => {
     const resetPostsToDefault = async() => {
         setPage(1)
         try {
-            // setOriginalPosts([])
-            // setPosts([])
-            const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestampOnUserID?page=1&user_id=${userID}`)
-            setOriginalPosts(res.data)
-            setPosts(res.data)
+            await setOriginalPosts([])
+            await setPosts([])
+            axios.get(`http://localhost:3307/Posts/Fetch10DescTimestampOnUserID?page=1&user_id=${userID}`).then((result) => {
+                setOriginalPosts(result.data)
+                setPosts(result.data)
+            })
+            
         } catch (err) {
             console.log(err)
         }
@@ -158,15 +162,16 @@ const Posts = ({collectedText, refresh_value}) => {
         if (filterText.length==0) {
             return;
         }
-        if (posts.length >= page * 10 || original_posts.length == totalNumPosts) {
-            return;
-        }
         ogFetchAllPosts().then(() => {
             fetchAllPosts().then(() => {
                 filterPosts().then(() => {
                     if (posts.length >= page * 10 || original_posts.length >= totalNumPosts) {
                         return;
                     }
+                    console.log("posts.length: ", posts.length)
+                    console.log("original_posts.length: ", original_posts.length)
+                    console.log("totalNumPosts: ", totalNumPosts)
+                    setPage(page + 1);
                 })
             })
         })
@@ -177,6 +182,13 @@ const Posts = ({collectedText, refresh_value}) => {
         if (filterText.length == 0) {
             resetPostsToDefault();
             return;
+        }
+        if (posts.length >= page * 10 || original_posts.length >= totalNumPosts) {
+            resetPostsToDefault();
+            console.log("posts.length: ", posts.length)
+            console.log("original_posts.length: ", original_posts.length)
+            console.log("totalNumPosts: ", totalNumPosts)
+            // setPage(1)
         }
         filterPosts();
         setPage(page + 1)

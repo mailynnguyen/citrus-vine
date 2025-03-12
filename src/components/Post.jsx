@@ -17,7 +17,7 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
     const isMounted = useRef(false)
     // console.log("[Post][userIDViewer]: ", userIDViewer)
     // console.log("[Post][postID]: ", postID)
-    console.log("[Post][numLikes]: ", numLikes)
+    // console.log("[Post][numLikes]: ", numLikes)
     // console.log("[Post][like]: ", like)
 
 

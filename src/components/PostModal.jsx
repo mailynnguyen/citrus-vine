@@ -18,9 +18,9 @@ const PostModal = ({ onClick, setCreate}) => {
         Anonymous: anonymous,
     })
 
-    console.log("[PostModal][Anonymous]: ", anonymous)
-    console.log("[PostModal][Username]: ", username)
-    console.log("[PostModal][post]: ", post)
+    // console.log("[PostModal][Anonymous]: ", anonymous)
+    // console.log("[PostModal][Username]: ", username)
+    // console.log("[PostModal][post]: ", post)
 
     const handleAnon = (e) => {
         e.preventDefault()
@@ -44,8 +44,8 @@ const PostModal = ({ onClick, setCreate}) => {
         e.preventDefault()
 
         try { 
-            console.log("[PostModal][handleClick()]")
-            console.log("[PostModal][Post]: ", post)
+            // console.log("[PostModal][handleClick()]")
+            // console.log("[PostModal][Post]: ", post)
             const res = axios.post("http://localhost:3307/Posts/InsertForwardAllRequiredAttributes", post).then(() => {
               console.log("hello")
               console.log("post created: ", res.data)
