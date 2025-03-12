@@ -1471,7 +1471,7 @@ const Prior = ""
         */
         app.post(UsersFetchOnID, (req, res) => {
                 const user_id = req.body.UserID
-                db.query(`SELECT * FROM Users WHERE CommentID = ${user_id}`, (err, data) => {
+                db.query(`SELECT Username, Bio, AssignedProfilePic FROM Users WHERE UserID = ${user_id}`, (err, data) => {
                         if (err) {
                                 return res.json(err)
                         }

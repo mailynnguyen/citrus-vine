@@ -17,7 +17,7 @@ export default async function Page({ params }) {
     return(
         {slug} && 
         <div>
-            <ProfileHeader></ProfileHeader>
+            <ProfileHeader id={slug}></ProfileHeader>
             <GridPosts id={slug}></GridPosts>
         </div>
 
