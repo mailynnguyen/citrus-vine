@@ -301,7 +301,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'Anonymous'
                                 END AS Username,
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 CASE
                                         WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
@@ -336,7 +336,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'Anonymous'
                                 END AS Username,
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 CASE
                                         WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
@@ -373,7 +373,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'Anonymous'
                                 END AS Username,
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE Cl.CommentID = C.CommentID AND C.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 CASE
                                         WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
@@ -405,7 +405,7 @@ const Prior = ""
                 db.query(`
                         SELECT P.Timestamp, P.Content, U.Username, 
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
                         WHERE P.PostID = ${post_id}`,
@@ -434,12 +434,12 @@ const Prior = ""
         app.post(PostsFetchOnUserID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`
-                        SELECT P.Timestamp, P.Content, U.Username, 
+                       SELECT P.Timestamp, P.Content, U.Username, 
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
-                                U.AssignedProfilePic as UsedProfilePic
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
+                                U.AssignedProfilePic AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
-                        CROSS JOIN (SELECT ${user_id} as Param) AS x
+                        CROSS JOIN (SELECT ${user_id} AS Param) AS x
                         WHERE P.UserID = x.Param AND U.UserID = x.Param AND P.Anonymous = 0
                         `, 
                         
@@ -463,7 +463,7 @@ const Prior = ""
                 db.query(`
                         SELECT P.Timestamp, P.Content, U.Username, 
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
                         CROSS JOIN (SELECT ${username} as Param) AS x
@@ -490,7 +490,7 @@ const Prior = ""
                 db.query(`
                         SELECT P.Timestamp, P.Content, U.Username, 
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
                         CROSS JOIN (SELECT ${user_id} as Param) AS x
@@ -519,7 +519,7 @@ const Prior = ""
                 db.query(`
                         SELECT P.Timestamp, P.Content, U.Username, 
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
                         CROSS JOIN (SELECT ${user_id} as Param) AS x
@@ -548,7 +548,7 @@ const Prior = ""
                 db.query(`
                         SELECT P.Timestamp, P.Content, U.Username, 
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
                         CROSS JOIN (SELECT ${user_id} as Param) AS x
@@ -577,7 +577,7 @@ const Prior = ""
                 db.query(`
                         SELECT P.Timestamp, P.Content, U.Username, 
                                 (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
-                                (SELECT COUNT(*) FROM CommentLikes Cl.PostID = P.PostID) AS NumComments,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
                         CROSS JOIN (SELECT ${user_id} as Param) AS x
