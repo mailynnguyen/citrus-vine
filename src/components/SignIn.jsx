@@ -31,6 +31,7 @@ const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onCha
             />  
             {type === "password" && (
                 <button 
+                    data-testid="eye-toggle-test"
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)} 
                     style={{ 
@@ -153,7 +154,9 @@ function SignIn() {
                 <input 
                     type="submit" 
                     value="Sign In" 
-                    className="sign-in-button">
+                    className="sign-in-button"
+                    data-testid="sign-in-button"
+                >
                 </input>
             </form>
 
