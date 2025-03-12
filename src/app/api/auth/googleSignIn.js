@@ -25,6 +25,7 @@ router.post('/googleSignIn', async (req, res) => {
         
         if (userExists) {
             console.log("An account with this email already exists.");
+            
             return res.status(200).json({ message: 'Google Sign-in Successful!'});
             // return res.status(409).json({ message: 'Email already exists'});
         }
