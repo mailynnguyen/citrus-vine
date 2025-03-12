@@ -1,53 +1,66 @@
 // App Initialization
-const express = require("express")
-const mysql = require("mysql2")
-const cors = require("cors");
-// const promise = require("mysql2/promise")
-const { M_PLUS_1 } = require("next/font/google");
-// const { DatabaseBackup } = require("lucide-react");
 
-const app = express()
-app.use(cors());
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import mysql from 'mysql2';
+import passport from 'passport';
+import session from 'express-session';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+
+
+const app = express();
+dotenv.config();
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
-// app.use(promise());
 
 
-//Database Server
+// Database Server
 var hostname = "e7mhj.h.filess.io";
 var database = "CitrusVineDB_oxygenbend";
 var port = "3307";
 var username = "CitrusVineDB_oxygenbend";
 var password = "51eb7f921a83851a80e14c57d7c81c80624c1c12";
 
-var db = mysql.createConnection({
-  host: hostname,
-  user: username,
-  password,
-  database,
-  port,
+const db = mysql.createConnection({
+        host: hostname,
+        user: username,
+        password,
+        database,
+        port,
 });
 
 db.connect(function (err) {
-  if (err) throw err;
-  console.log(`Connected to db: ${hostname}:${port}!`);
+        if (err) throw err;
+        console.log(`Connected to db: ${hostname}:${port}`);
 });
 
-// db.query("SELECT 1+1").on("result", function (row) {
-//   console.log(row);
-// });
+export default db;
 
+// Web server
 app.listen(3307, () => {
-  console.log(`App connected to db! Please visit http://localhost:3307/ to see returns.`)
+        console.log(`App connected to db! Please visit http://localhost:3307/ to see returns.`)
 })
-      
-app.get("/", (req, res) => {
-        res.send("Connection.js is functional.")
-})
-/*
-        Routers
+
+
+/* 
+----------------------------- AUTHENTCATION & AUTHORIZATION -----------------------------
 */
-const userQueryRouter = require('./query-routes/users')
-app.use('/UsersQuery', userQueryRouter)
+
+import signInRoute from './api/auth/signin.js';
+import signUpRoute from './api/auth/signup.js';
+import googleSignInRoute from './api/auth/googleSignIn.js';
+
+app.use('/api/auth', signInRoute);
+app.use('/api/auth', signUpRoute);
+app.use('/api/auth', googleSignInRoute);
+      
+/*
+-----------------------------  Routers -----------------------------
+*/
+import userQueryRouter from './query-routes/users.js';
+app.use('/UsersQuery', userQueryRouter);
+
 
 /*
         NOTES:

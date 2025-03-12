@@ -1,74 +1,192 @@
 "use client"
-import React, { useState } from "react";
-import { Heart } from 'lucide-react';
-import '@/styles/signin.css';
-import CitrusBg from "../images/citrus-bg.jpeg";
+import React, { useState, useEffect } from "react";
+import { Eye, EyeOff, Search } from "lucide-react";
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import '@/styles/sign-in.css';
+import { UsersFetchAll } from "@/app/paths";
 
 
-import axios from "axios";
-import { UsersValidateAccount } from "@/app/paths";
-import Link from 'next/link'
+const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onChange}) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    return (
+        <div style={{ position: "relative", display: "inline-block" }}>
+            <div className="sign-up-text" style={{ fontWeight: "bold", color: "white" }}>{fieldName}</div>
+            <input 
+                value={value} 
+                placeholder={fieldPlaceHolder} 
+                type={type === "password" && !showPassword ? "password" : "text"} // Toggle visibility
+                onChange={onChange} 
+                style={{ 
+                    width: `${fieldWidth}`, 
+                    height: "30px", 
+                    borderRadius: "10px", 
+                    paddingLeft: "10px", 
+                    paddingRight: "35px" // Space for the eye icon 
+                }} 
+            />  
+            {type === "password" && (
+                <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    style={{ 
+                        position: "absolute", 
+                        right: "10px", 
+                        top: "70%", 
+                        transform: "translateY(-50%)",
+                        background: "none", 
+                        border: "none", 
+                        cursor: "pointer",
+                        color: "black"
+                    }}
+                >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+            )}
+        </div>
+    );
+}
 
 
 function SignIn() {
-    const [user, enterUser] = useState("");
+    const router = useRouter();
+    const [isClient, setIsClient] = useState(false);
+    const [username, enterUsername] = useState("");
     const [password, enterPassword] = useState("");
 
-    const AttemptSignIn = async(enteredUser, enteredPassword) => {
+
+
+    useEffect(() => {
+        setIsClient(true); // Mark as client-side rendered after initial render
+    }, []);
+
+
+    const googleLogin = async (userData) => {
+        console.log("UserData:", userData);
         try {
-            var submission = {
-                "Username": `\'${enteredUser}\'`,
-                "Password": `\'${enteredPassword}\'`
+            const saveUserResponse = await axios.post('http://localhost:3307/api/auth/googleSignIn', userData);
+            console.log('Save user response:', saveUserResponse);
+
+            if (saveUserResponse.status === 200) {
+                console.log(saveUserResponse.data);
+                console.log('Google sign-in successful!');
+                router.push('/home');
+            } else {
+                alert(`Error: ${data.message}`);
             }
-            console.log("Provided username: ", enteredUser)
-            console.log("Provided password: ", enteredPassword)
-            var result = axios.post(UsersValidateAccount, submission)
-            console.log("[AttemptSignIn][Try]: ", result)
-            return result
-        }
-        catch(err) {
-            console.log("Error: ", err)
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("An error occurred while signing in with Google. Please try again.");
+            }
         }
     }
-    const ClickSignIn = (enteredUsername, enteredPassword) => {
-        AttemptSignIn(enteredUsername, enteredPassword)
-            .then((result) => {
-            var valid = result.data[0].Outcome
-            console.log("[AttemptSignIn][.then]: ", valid)
 
-            if (valid) {
-                console.log("Successful sign in!")
-                /*
-                    Potentially insert routing process here.
-                */
-            }
-            else {
-                alert("Invalid username or password.")
-            }
-        })
+    // Redirect to sign-up page when "Dont have an account?" button is clicked.
+    const handleSignUp = () => {
+        router.push('/signUp');
     }
-    
 
-    return(
-        <section id="bg-holder" style={{backgroundImage: `url(${CitrusBg.src})`}}>
-            <div className="sign-in-text">Citrus Vine</div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-            <div className="sign-in-form">
-                <input type="text" id="userEntry" className="input-text" placeholder="Enter username..." value={user} onChange={(e) => enterUser(e.target.value)}></input>
+        if (!username || !password) {
+            alert("Please enter both username and password.");
+            return;
+        }
 
-                <input type="password" id="passwordEntry" className="input-text" placeholder="Enter password..." value={password} onChange={(e) => enterPassword(e.target.value)}></input>
-                
-                <button className="sign-in-button" onClick={() => ClickSignIn(user, password)}>Sign In</button>
+        try {
+            const response = await axios.post('http://localhost:3307/api/auth/signin', {
+                username: username.trim(),
+                password: password.trim(),
+            });
+
+            if (response.status === 200) {
+                console.log(response.data);
+                console.log("Sign-in Successful!");
+                router.push('/home');
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("An error occurred while signing in. Please try again.");
+            }
+        }
+    }
+
+    if (!isClient) return null;
+
+    return (
+        <>
+            <div className="citrus-vine-text">Citrus Vine</div>
+            <div className="sign-in-text">Sign In</div>
+
+            <form className="sign-in-form" onSubmit={handleSubmit}>
+                <div className="input-row">
+                    <InputField 
+                        fieldName="Username"
+                        type="text"
+                        id="userEntry"
+                        className="input-text" 
+                        fieldPlaceHolder="Enter username here" 
+                        value={username} 
+                        onChange={(e) => enterUsername(e.target.value)}
+                    />
+                    <InputField 
+                        fieldName="Password"
+                        type="password"
+                        id="userEntry"
+                        className="input-text" 
+                        fieldPlaceHolder="Enter password here" 
+                        value={password} 
+                        onChange={(e) => enterPassword(e.target.value)}
+                    />
+                </div>
+                <input 
+                    type="submit" 
+                    value="Sign In" 
+                    className="sign-in-button">
+                </input>
+            </form>
+
+            <div className="line-with-text">
+                <span className="line-text">OR</span>
             </div>
 
+            <div className='button-container'>
+                <GoogleLogin
+                    onSuccess={credentialResponse => {
+                        const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
+                        // console.log(credentialResponseDecoded);
+                        const userData = {
+                            email: credentialResponseDecoded.email,
+                            name: credentialResponseDecoded.name,
+                            picture: credentialResponseDecoded.picture,
+                            given_name: credentialResponseDecoded.given_name,
+                            family_name: credentialResponseDecoded.family_name,
+                        };
 
-            {/*Need to implement functionality for buttons*/}
+                        googleLogin(userData);
+                    }}
+                    onError={() => {
+                        console.log('Google Login Failed');
+                    }}
+                />
+            </div>
+            
             <div id="alt-sign-in">
-                <Link className="sign-in-button" href="/signup">Don't have an account?</Link>
+                <button className="sign-in-button" onClick={handleSignUp}>Don't have an account?</button>
 
                 <button className="sign-in-button">Forgot password?</button>
             </div>
-        </section> 
+        </>
     )
 }
 

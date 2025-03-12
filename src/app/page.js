@@ -1,17 +1,13 @@
 "use client"
+import SignIn from "../components/SignIn";
 import React, { useState } from "react";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
-import PostModal from "@/components/PostModal";
-import Posts from "@/components/Posts";
-import SearchBar from "@/components/SearchBar";
-import SideBar from "@/components/SideBar";
-import Feed from "@/components/Feed";
 
-export default function Home() {
-
-  return(
-    <div>
-      <Feed/>
-    </div>
-  )
+export default function App({ children }) {
+    return (
+        <GoogleOAuthProvider clientId="338947513955-v2qbsiuud0q0s09ppebq6c22re1qj935.apps.googleusercontent.com">
+            <SignIn />
+        </GoogleOAuthProvider>
+    );
 }
