@@ -146,6 +146,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         `, 
                         
                 (err, data) => {
@@ -176,8 +177,9 @@ const Prior = ""
                                 CASE
                                         WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
-                                END AS UsedProfilePic
+                                END AS UsedProfilePic, P.PostID, P.UserID
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         LIMIT 10 OFFSET ${offset}
                         `, 
                         
@@ -210,6 +212,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         ORDER BY NumLikes ASC
                         `), 
                 
@@ -242,6 +245,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         ORDER BY NumLikes DESC
                         `), 
                 
@@ -274,6 +278,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         ORDER BY P.Timestamp ASC
                         `, 
                         
@@ -307,6 +312,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         ORDER BY P.Timestamp DESC
                         `, 
                         
@@ -342,6 +348,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         ORDER BY P.Timestamp ASC
                         LIMIT 10 OFFSET ${offset}
                         `, 
@@ -379,6 +386,7 @@ const Prior = ""
                                         WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
                                 END AS UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         ORDER BY P.Timestamp DESC
                         LIMIT 10 OFFSET ${offset}
                         `, 
@@ -408,6 +416,7 @@ const Prior = ""
                                 (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
                                 U.AssignedProfilePic as UsedProfilePic
                         FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
                         WHERE P.PostID = ${post_id}`,
                         
                         (err, data) => {
