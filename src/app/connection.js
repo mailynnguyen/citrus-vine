@@ -78,6 +78,7 @@ app.use('/api/auth', googleSignInRoute);
 -----------------------------  Routers -----------------------------
 */
 import userQueryRouter from './query-routes/users.js';
+import { DatabaseBackup } from 'lucide-react';
 app.use('/UsersQuery', userQueryRouter);
 
 
@@ -121,12 +122,15 @@ const Prior = ""
         */
         const Posts = Prior + "/Posts"
                 const PostsFetchAll = Posts + "/FetchAll"
+                const PostsFetchAllFilled = Posts + "/FetchAllFilled"
                 const PostsFetch10 = Posts + "/Fetch10"
                 const PostsFetchAscLikes = Posts + "/FetchAscLikes"
                 const PostsFetchDescLikes = Posts + "/FetchDescLikes"
                 const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
                 const PostsFetch10AscTimestamp = Posts + "/Fetch10AscTimestamp"
                 const PostsFetch10DescTimestamp = Posts + "/Fetch10DescTimestamp"
+
+                const PostsFetch10DescTimestampOnUserID = Posts + "/Fetch10DescTimestampOnUserID"
                 const PostsFetchDescTimestamp = Posts + "/FetchOnDescTimestamp"
 
                 const PostsFetchOnPostID = Posts + "/FetchOnPostID"
@@ -138,14 +142,17 @@ const Prior = ""
                 const PostsFetchDescLikesOnUserID = Posts + "/FetchOnDescLikesOnUserID"
 
                 const PostsGetLikes = Posts + "/FetchLikes"
+                const PostsGetIsLikedByUser = Posts + "/GetIsLikedByUser"
 
                 const PostsInsertManual = Posts + "/InsertManual"
                 const PostsInsertForward = Posts + "/InsertForward"
+                const PostsInsertForwardAllRequiredAttributes = Posts + "/InsertForwardAllRequiredAttributes"
 
                 const PostsIncrementLikes = Posts + "/IncrementLikes"
                 const PostsDecrementLikes = Posts + "/DecrementLikes"
 
                 const PostDeleteOnPostID = Posts + "/DeleteOnPostID"
+                const PostsGetTotalPosts = Posts + "/GetTotalPosts"
 
         /*
                 .get parameters: [path: str] 
@@ -176,6 +183,44 @@ const Prior = ""
                                 return res.json(data)
                         }
                 });
+        });
+        app.get(PostsFetchAllFilled, (req, res) => {
+                const user_id = req.query.user_id
+                db.query(`
+                        SELECT 
+                                P.PostID,
+                                P.Timestamp, 
+                                P.Content, 
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN P.Username
+                                        WHEN P.Anonymous = 1 THEN "Anonymous"
+                                END AS Username,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS AssignedProfilePic,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
+                                (SELECT COUNT(*) > 0 FROM PostLikes A WHERE A.PostID = P.PostID AND A.UserID = ${user_id}) AS IsLikedByUser
+                        FROM Posts P
+                        LEFT JOIN PostLikes PL
+                                ON PL.PostID = P.PostID
+                        LEFT JOIN Users U
+                                ON U.UserID = P.UserID
+                        LEFT JOIN Comments C
+                                ON C.PostID = PL.PostID
+                        ORDER BY P.Timestamp DESC
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
         });
 
         /*
@@ -423,6 +468,90 @@ const Prior = ""
 
 
 
+        /*
+                .get parameters: [Path: str]
+                .get return: ARRAY[{"Timestamp": str, "Content": str, "Username": str, "Likes": int, "CommentCount": int]
+        */
+
+        //Now shows correct username, or anon when applicable. Like and comment counts were fixed
+        app.get(PostsFetch10DescTimestamp, (req, res) => {
+                const offset = (req.query.page - 1) * 10
+                db.query(`
+                        SELECT P.Timestamp, P.Content,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.Username
+                                        WHEN P.Anonymous = 1 THEN 'Anonymous'
+                                END AS Username,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS UsedProfilePic
+                        FROM Posts P, Users U, Comments C
+                        WHERE P.UserID = U.UserID
+                        ORDER BY P.Timestamp DESC
+                        LIMIT 10 OFFSET ${offset}
+                        `, 
+                        
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        });
+
+
+        /*
+                .get parameters: [Path: str], .implicit parameters: [page: int, user_id: id]
+                .get return: ARRAY[{"Timestamp": str, "Content": str, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.get(PostsFetch10DescTimestampOnUserID, (req, res) => {
+                const offset = (req.query.page - 1) * 10
+                const user_id = req.query.user_id
+                db.query(`
+                        SELECT 
+                                P.PostID,
+                                P.Timestamp, 
+                                P.Content, 
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN P.Username
+                                        WHEN P.Anonymous = 1 THEN "Anonymous"
+                                END AS Username,
+                                CASE
+                                        WHEN P.Anonymous = 0 THEN U.AssignedProfilePic
+                                        WHEN P.Anonymous = 1 THEN 'empty-pfp.svg'
+                                END AS AssignedProfilePic,
+                                (SELECT COUNT(*) FROM PostLikes Pl WHERE Pl.PostID = P.PostID) AS NumLikes,
+                                (SELECT COUNT(*) FROM CommentLikes Cl WHERE C.PostID = P.PostID AND C.CommentID = Cl.CommentID) AS NumComments,
+                                (SELECT COUNT(*) > 0 FROM PostLikes A WHERE A.PostID = P.PostID AND A.UserID = ${user_id}) AS IsLikedByUser
+                        FROM Posts P
+                        LEFT JOIN PostLikes PL
+                                ON PL.PostID = P.PostID
+                        LEFT JOIN Users U
+                                ON U.UserID = P.UserID
+                        LEFT JOIN Comments C
+                                ON C.PostID = PL.PostID
+                        ORDER BY P.Timestamp DESC
+                        LIMIT 10 OFFSET ${offset}
+                        `,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                                else {
+                                        return res.json(data)
+                                }
+                        }
+                );
+        })
+
+        
         /*
                 .post parameters: [Path: str, {"PostID": int}]
                 .get return: ARRAY[{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
@@ -700,6 +829,23 @@ const Prior = ""
                 const content = req.body.Content
                 const anonymous = req.body.Anonymous
                 
+                // var username = "ERROR"
+                // db.query(`
+                //         SELECT Username
+                //         FROM Users
+                //         WHERE UserID = ${user_id}
+                //         `,
+                
+                //         (err, data) => {
+                //                 if (err) {
+                //                         return res.json(err)
+                //                 } else {
+                //                         console.log("[PostsInsertForward][username: str][Before]: ", username)
+                //                         username = data.Username;
+                //                         console.log("[PostsInsertForward][username: str][After]: ", username)
+                //                 }
+                //         }
+                // );
                 db.query(`
                         INSERT INTO Posts (UserID, Timestamp, Content, Anonymous) 
                         VALUES (
@@ -749,6 +895,34 @@ const Prior = ""
                         }
                 )*/
         });
+        /*
+                .post parameters: [Path: str, {"UserID": int, "Content": str, "Anonymous": bool, "Username": str}]
+                .get return: [{"PostID": int, "UserID": int, "Timestamp": str, "Content": str, "Anonymous": bool, "Username": str, "Likes": int, "CommentCount": int]
+        */
+        app.post(PostsInsertForwardAllRequiredAttributes, (req, res) => {
+                const user_id = req.body.UserID
+                const username = req.body.Username
+                const content = req.body.Content
+                const anonymous = req.body.Anonymous
+                
+
+                db.query(`
+                        INSERT INTO Posts (UserID, Username, Timestamp, Content, Anonymous) 
+                        VALUES (
+                                ${user_id}, 
+                                ${username},
+                                CURRENT_TIMESTAMP(), 
+                                '${content}', 
+                                ${anonymous}
+                        )`,
+
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                }
+                        }
+                );
+        });
 
 
         /*
@@ -758,7 +932,7 @@ const Prior = ""
         app.post(PostsGetLikes, (req, res) => {
                 const post_id = req.body.PostID
                 db.query(`
-                        SELECT COUNT(*)
+                        SELECT COUNT(*) AS Likes
                         FROM PostLikes
                         WHERE PostID = ${post_id}
                         `,
@@ -772,6 +946,8 @@ const Prior = ""
                 });
 
         });
+
+
 
 
         /*
@@ -816,7 +992,7 @@ const Prior = ""
                 const user_id = req.body.UserID
                 const post_id = req.body.PostID
                 db.query(` 
-                        DELETE PostLikes 
+                        DELETE FROM PostLikes 
                         WHERE UserID = ${user_id} AND PostID = ${post_id}
                         `,
 
@@ -852,8 +1028,8 @@ const Prior = ""
                 .post parameters: [Path: str, "PostID": str}]
                 .get return: ["Outcome": bool]
         */
-        app.post(PostDeleteOnPostID, (res, data) => {
-                const post_id = res.body.PostID
+        app.post(PostDeleteOnPostID, (req, res) => {
+                const post_id = req.body.PostID
                 db.query(`
                         DELETE FROM Posts
                         WHERE PostID = ${post_id}
@@ -893,6 +1069,23 @@ const Prior = ""
         })
 
 
+        /*
+                .get parameters: [Path: str]
+                .get return: ["NumPosts": bool]
+        */
+        app.get(PostsGetTotalPosts, (req, res) => {
+                db.query(`
+                        SELECT COUNT(*) AS NumPosts
+                        FROM Posts`,
+                
+                        (err, data) => {
+                                if (err) {
+                                        return res.json(err)
+                                } else {
+                                        return res.json(data)
+                                }
+                        })
+        })
 
 /*
 ------------------------- COMMENTS -------------------------
