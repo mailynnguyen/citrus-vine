@@ -7,13 +7,21 @@ import mysql from 'mysql2';
 import passport from 'passport';
 import session from 'express-session';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-
+import MySQLStoreFactory from "express-mysql-session";
+const MySQLStore = MySQLStoreFactory(session);
 
 const app = express();
 dotenv.config();
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-app.use(express.json());
 
+app.use(cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+        methods: "GET,POST,PUT,DELETE,OPTIONS",  
+    allowedHeaders: "Content-Type,Authorization"
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.options("*", cors());
 
 // Database Server
 var hostname = "e7mhj.h.filess.io";
@@ -34,6 +42,17 @@ db.connect(function (err) {
         if (err) throw err;
         console.log(`Connected to db: ${hostname}:${port}`);
 });
+
+const sessionStore = new MySQLStore({}, db);
+
+app.use(session({
+        key: "user_sid", 
+        secret: "your_secret_key", 
+        resave: false, 
+        saveUninitialized: false, 
+        store: sessionStore, 
+        cookie: { maxAge: 1000 * 60 * 60 * 24 } 
+        }));
 
 export default db;
 
@@ -1650,6 +1669,64 @@ const Prior = ""
 
                 const UsersValidateAccount = Users + "/ValidateAccount"
                 const UsersDeleteAccount = Users + "/DeleteAccount"
+                const UsersLogout = Users + "/Logout"
+                const UsersSession = Users + "/Session"
+                const UsersCreateSession = Users + "/CreateSession"
+
+
+        app.get(UsersSession, (req, res) => {
+                console.log("Session Data:", req.session);
+
+                if (req.session.user) {
+                        res.json({ userID: req.session.user.id }); // Returns { id }
+                } else {
+                        res.status(401).json({ error: "Not authenticated" });
+                }
+        });
+
+
+        app.post(UsersLogout, (req, res) => {
+                req.session.destroy((err) => {
+                        if (err) {
+                                return res.json(err)
+                        } else {
+                                res.json({ message: "Logged out successfully" });
+                        }
+                });
+        });
+
+        app.post(UsersCreateSession, (req, res) => {
+                const username = req.body.Username
+                db.query(` 
+                        SELECT userID FROM Users WHERE Username = ?`, 
+                        [username],
+
+                        (err, data) => {
+                                if (err) {
+                                        console.error("Database Error:", err);
+                                        return res.status(500).json({ error: "Database error" });
+                                }
+                        
+                                if (data.length === 0) {
+                                        console.log("Invalid login attempt");
+                                        return res.status(401).json({ error: "Invalid username or password" });
+                                }
+                        
+                                req.session.user = { id: data[0].userID };  
+                                console.log("Session Before Save:", req.session.data);
+                        
+                                req.session.save((saveErr) => {  
+                                        if (saveErr) {
+                                        console.error("Session Save Error:", saveErr);
+                                        return res.status(500).json({ error: "Session save failed" });
+                                        }
+                                        console.log("Session After Save:", req.session.data);
+                                        res.json({ userID: req.session.user.id });
+                                });
+                        }
+                            
+                )
+        });
 
         /*
                 .get parameters: [Path: str]

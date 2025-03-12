@@ -21,6 +21,7 @@
         npm i lucide-react
         npm i -g concurrently
         npm i passport
+        npm i express-mysql-session
 
         # Extensions
                 # MySQL Shell for VS Code
