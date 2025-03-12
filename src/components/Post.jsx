@@ -4,11 +4,34 @@ import { Heart } from 'lucide-react';
 import { MessageCircle } from "lucide-react";
 import '@/styles/post.css';
 
+import axios from "axios";
+import { PostsIncrementLikes, PostsDecrementLikes } from "@/app/paths";
 
-const Post = ({ body, date_time, display_name, pfp, num_likes, num_comments }) => {
+const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comments, is_liked, user_id_viewer}) => {
 
-    const [like, setLike] = useState(false);
+    const [userIDViewer, setUserID] = useState(user_id_viewer)
+    const [postID, setPostID] = useState(post_id)
+    const [numLikes, setNumLikes] = useState(num_likes)
+    const [like, setLike] = useState(is_liked);
 
+    console.log("[Post][userIDViewer]: ", userIDViewer)
+    console.log("[Post][postID]: ", postID)
+    // console.log("[Post][numLikes]: ", numLikes)
+    // console.log("[Post][like]: ", like)
+    const Like = () => {
+        setLike(!like)
+        setNumLikes(numLikes + 1);
+        num_likes += 1;
+        var res = axios.post(PostsIncrementLikes, {"PostID": postID, "UserID": userIDViewer})     
+        console.log("[Post][Like()][axios.post]: ", res)
+    }
+    const Unlike = () => {
+        setLike(!like)
+        setNumLikes(numLikes - 1);
+        num_likes -= 1;
+        var res = axios.post(PostsDecrementLikes, {"PostID": postID, "UserID": userIDViewer})
+        console.log("[Post][Unlike()][axios.post]: ", res)
+    }
     
     return (
         <div id="post">
@@ -29,10 +52,10 @@ const Post = ({ body, date_time, display_name, pfp, num_likes, num_comments }) =
                 <div className="post-button-holder">
                     <div className="post-like-button">
                             {like
-                                ? <Heart className="heart" id="heart-filled" onClick={() => setLike(!like)} fill="#BE4A31" strokeWidth={0} />
-                                : <Heart className="heart" id="heart-outline" onClick={() => setLike(!like)} strokeWidth={1.3} color="#878787" />
+                                ? <Heart className="heart" id="heart-filled" onClick={() => Unlike()} fill="#BE4A31" strokeWidth={0} />
+                                : <Heart className="heart" id="heart-outline" onClick={() => Like()} strokeWidth={1.3} color="#878787" />
                             }
-                            <p id="like-count">{num_likes}</p>
+                            <p id="like-count">{numLikes}</p>
                     </div>
 
                     <div className="post-comment-button">
