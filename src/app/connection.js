@@ -192,7 +192,7 @@ const Prior = ""
                                 P.Timestamp, 
                                 P.Content, 
                                 CASE
-                                        WHEN P.Anonymous = 0 THEN P.Username
+                                        WHEN P.Anonymous = 0 THEN U.Username
                                         WHEN P.Anonymous = 1 THEN "Anonymous"
                                 END AS Username,
                                 CASE
@@ -519,7 +519,7 @@ const Prior = ""
                                 P.Timestamp, 
                                 P.Content, 
                                 CASE
-                                        WHEN P.Anonymous = 0 THEN P.Username
+                                        WHEN P.Anonymous = 0 THEN U.Username
                                         WHEN P.Anonymous = 1 THEN "Anonymous"
                                 END AS Username,
                                 CASE
