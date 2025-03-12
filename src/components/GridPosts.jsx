@@ -38,6 +38,9 @@ const GridPosts = ( {id} ) => {
                         body={gridPost.Content}
                         display_name={gridPost.Username}
                         date_time={new Date(gridPost.Timestamp).toISOString().slice(0, 19).replace('T', ' ')} // doing the splice b/c instance of Date
+                        pfp={gridPost.UsedProfilePic}
+                        num_likes={gridPost.NumLikes}
+                        num_comments={gridPost.NumComments}
                     />
             ))}
 

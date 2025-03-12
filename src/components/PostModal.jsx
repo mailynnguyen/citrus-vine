@@ -10,10 +10,10 @@ const PostModal = ({ onClick, setCreate }) => {
 
     const [anonymous, setAnonymous] = useState(false)
     const [post, setPost] = useState({
-        UserID: 1,
+        UserID: 36,
         Content: "",
         Anonymous: anonymous,
-        Username: "mailyn"
+        //Username: "mailyn"
     })
 
     const handleAnon = (e) => {
@@ -73,8 +73,8 @@ const PostModal = ({ onClick, setCreate }) => {
                     <div id="post-modal-buttons">
                         {
                             anonymous
-                            ? <Button title="Anonymous OFF" onClick={handleAnon} />
-                            : <Button title="Anonymous ON" onClick={handleAnon} />
+                            ? <Button title="Anonymous is ON" onClick={handleAnon} />
+                            : <Button title="Anonymous is OFF" onClick={handleAnon} />
 
                         }
                         

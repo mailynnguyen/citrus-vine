@@ -4,13 +4,13 @@ import React, { useState } from "react";
 import { Heart, MessageCircle } from "lucide-react";
 import "@/styles/gridpost.css";
 
-const GridPost = ({body, date_time, display_name}) => {
+const GridPost = ({body, date_time, display_name, pfp, num_likes, num_comments}) => {
   const [like, setLike] = useState(false);
 
   return (
     <div className="gridpost">
       <div className="gridpost-info-holder">
-        <div className="gridpost-profile-pic"></div>
+        <img src={"/" + pfp} className="gridpost-profile-pic"></img>
         <div /*id="display-name"*/ className="gridpost-name">
           {display_name}
         </div>
@@ -31,12 +31,12 @@ const GridPost = ({body, date_time, display_name}) => {
           ) : (
             <Heart className="heart" strokeWidth={1.3} color="#878787" />
           )}
-          <p id="like-count">1024</p>
+          <p id="like-count">{num_likes}</p>
         </div>
 
         <div className="comment-button">
           <MessageCircle className="commentbutton" />
-          <p id="comment-count">2000</p>
+          <p id="comment-count">{num_comments}</p>
         </div>
       </div>
     </div>

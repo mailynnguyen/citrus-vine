@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from "lucide-react";
 import axios from 'axios';
 import "../styles/sign-up.css";
+import CitrusBg from "../images/citrus-bg.jpeg";
 
 
 
@@ -104,7 +105,7 @@ function SignUp() {
   // if (isClient) return null;
 
   return (
-    <div>
+    <div className="sign-up-background" style={{backgroundImage: `url(${CitrusBg.src})`}}>
         <div className="title-container">
           <div className="citrus-vine-title">Citrus Vine</div>
           <div className='sign-up-title'>Sign Up</div>
