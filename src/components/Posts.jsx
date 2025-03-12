@@ -26,6 +26,7 @@ const Posts = ({collectedText}) => {
     console.log("Length [original_posts]: ", original_posts.length)
     console.log("Length [posts]: ", posts.length)
     console.log("Total num posts: ", totalNumPosts)
+    console.log("Posts: ", posts)
     if (collectedText != filterText) {
         setFilterText(collectedText)
     }
@@ -70,7 +71,6 @@ const Posts = ({collectedText}) => {
         }
     };
 
-    //UNUSED FOR NOW
     const resetPostsToDefault = async() => {
         setPage(1)
         try {
@@ -85,28 +85,28 @@ const Posts = ({collectedText}) => {
     var recently_filtered = false
     const filterPosts = async() => {
         try {
-            console.log("Called [filterPosts()]")
+            // console.log("Called [filterPosts()]")
             if (filterText.length == 0) {
                 setOriginalPosts([])
                 setPosts([])
                 setPage(1)
                 ogFetchAllPosts()
                 fetchAllPosts()
-                console.log("Condition [filterText.length]: ", filterText.length)
+                // console.log("Condition [filterText.length]: ", filterText.length)
                 return;
             }
-            console.log("Condition [Action]: Filtering posts...")
+            // console.log("Condition [Action]: Filtering posts...")
             var filteredPosts = []
             recently_filtered = true;
             for (var i = 0, post; i < original_posts.length, post = original_posts[i]; ++i) {
-                console.log("[filterText]: ", filterText)
-                console.log("[post.Content]: ", post.Content)
-                console.log("[post.Username]: ", post.Username)
+                // console.log("[filterText]: ", filterText)
+                // console.log("[post.Content]: ", post.Content)
+                // console.log("[post.Username]: ", post.Username)
                 if (post.Username == null || post.Content == null) {
                     continue;
                 }
                 if (post.Content.includes(filterText) || post.Username.includes(filterText)) {
-                    console.log("Found a non-filtered post")
+                    // console.log("Found a non-filtered post")
                     filteredPosts.push(post)
                 }
             }
@@ -140,6 +140,9 @@ const Posts = ({collectedText}) => {
         ogFetchAllPosts().then(() => {
             fetchAllPosts().then(() => {
                 filterPosts().then(() => {
+                    if (posts.length >= page * 10 || original_posts.length >= totalNumPosts) {
+                        return;
+                    }
                     setPage(page + 1);
                 })
             })
@@ -148,7 +151,7 @@ const Posts = ({collectedText}) => {
     var recently_ran = false;
     useEffect(() => {
         recently_ran = true;
-        if (filterText == "") {
+        if (filterText.length == 0) {
             resetPostsToDefault();
             return;
         }
@@ -163,6 +166,7 @@ const Posts = ({collectedText}) => {
     //     filterPosts();
     // },[page])
     const HandleClick = async () => {
+        resetPostsToDefault();
         setPage(page + 1);
     }
 
@@ -172,6 +176,7 @@ const Posts = ({collectedText}) => {
                 FetchMoreAndFilter()
             }
             else {
+                resetPostsToDefault();
                 ogFetchAllPosts();
                 fetchAllPosts();
             }

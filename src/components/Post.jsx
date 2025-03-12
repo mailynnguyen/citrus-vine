@@ -1,11 +1,11 @@
 "use client"
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Heart } from 'lucide-react';
 import { MessageCircle } from "lucide-react";
 import '@/styles/post.css';
 
 import axios from "axios";
-import { PostsIncrementLikes, PostsDecrementLikes } from "@/app/paths";
+import { PostsIncrementLikes, PostsDecrementLikes, PostsGetLikes} from "@/app/paths";
 
 const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comments, is_liked, user_id_viewer}) => {
 
@@ -14,30 +14,49 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
     const [numLikes, setNumLikes] = useState(num_likes)
     const [like, setLike] = useState(is_liked);
 
+    const isMounted = useRef(false)
     // console.log("[Post][userIDViewer]: ", userIDViewer)
     // console.log("[Post][postID]: ", postID)
-    // console.log("[Post][numLikes]: ", numLikes)
+    console.log("[Post][numLikes]: ", numLikes)
     // console.log("[Post][like]: ", like)
 
 
     const Like = () => {
         setLike(!like)
         setNumLikes(numLikes + 1);
-        var res = axios.post(PostsIncrementLikes, {"PostID": postID, "UserID": userIDViewer})     
-        console.log("[Post][Like()][axios.post]: ", res)
+        axios.post(PostsIncrementLikes, {"PostID": postID, "UserID": userIDViewer}).then((result) => {
+            console.log("[Post][Like()][axios.post]: ", res)
+        })
         // numLikes = res.data[0].NumLikes
     }
     const Unlike = () => {
         setLike(!like)
         setNumLikes(numLikes - 1);
-        var res = axios.post(PostsDecrementLikes, {"PostID": postID, "UserID": userIDViewer})
-        console.log("[Post][Unlike()][axios.post]: ", res)
+        axios.post(PostsDecrementLikes, {"PostID": postID, "UserID": userIDViewer}).then((result) => {
+            console.log("[Post][Unlike()][axios.post]: ", res)
+        })
         // numLikes = res.data[0].NumLikes
     }
 
-    useEffect(() => {
 
+    const RefetchNumLikes = async () => {
+        axios.post(PostsGetLikes, {"PostID": postID}).then((result) =>
+            {
+                console.log("[Post][RefetchNumLikes]: ", result.data[0].Likes)
+                setNumLikes(result.data[0].Likes)
+            }
+        )
+    }
+    useEffect(() => {
+        if (!isMounted.current) {
+            isMounted.current = true;
+            return;
+        }
+        RefetchNumLikes()
     }, [like])
+
+
+    
     
     return (
         <div id="post">

@@ -913,7 +913,7 @@ const Prior = ""
         app.post(PostsGetLikes, (req, res) => {
                 const post_id = req.body.PostID
                 db.query(`
-                        SELECT COUNT(*)
+                        SELECT COUNT(*) AS Likes
                         FROM PostLikes
                         WHERE PostID = ${post_id}
                         `,
