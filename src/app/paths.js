@@ -2,6 +2,7 @@ const Prior = "http://localhost:3307"
 
 const Posts = Prior + "/Posts"
         export const PostsFetchAll = Posts + "/FetchAll"
+        export const PostsFetchAllFilled = Posts + "/FetchAllFilled"
         export const PostsFetchAscLikes = Posts + "/FetchAscLikes"
         export const PostsFetchDescLikes = Posts + "/FetchDescLikes"
         export const PostsFetchAscTimestamp = Posts + "/FetchOnAscTimestamp"
@@ -14,6 +15,9 @@ const Posts = Prior + "/Posts"
         export const PostsFetchDescTimestampOnUserID = Posts + "/FetchOnDescTimestampOnUserID"
         export const PostsFetch10AscTimestamp = Posts + "/Fetch10AscTimestamp"
         export const PostsFetch10DescTimestamp = Posts + "/Fetch10AscTimestamp"
+
+        export const PostsFetch10DescTimestampOnUserID = Posts + "/Fetch10DescTimestampOnUserID"
+
         export const PostsFetchAscLikesOnUserID = Posts + "/FetchOnAscLikesOnUserID"
         export const PostsFetchDescLikesOnUserID = Posts + "/FetchOnDescLikesOnUserID"
 
@@ -26,6 +30,7 @@ const Posts = Prior + "/Posts"
         export const PostsDecrementLikes = Posts + "/DecrementLikes"
 
         export const PostDeleteOnPostID = Posts + "/DeleteOnPostID"
+        export const PostsGetTotalPosts = Posts + "/GetTotalPosts"
 
 const Comments = Prior + "/Comments"
         export const CommentsFetchAll = Comments + "/Fetch"
