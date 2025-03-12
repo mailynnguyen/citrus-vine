@@ -51,7 +51,12 @@ app.use(session({
         resave: false, 
         saveUninitialized: false, 
         store: sessionStore, 
-        cookie: { maxAge: 1000 * 60 * 60 * 24 } 
+        cookie: { 
+                maxAge: 1000 * 60 * 60 * 24,
+                secure: false,  // Set to true if using HTTPS
+                httpOnly: true,
+                sameSite: "lax"  // Allows session persistence
+        }
         }));
 
 export default db;
@@ -1480,7 +1485,7 @@ const Prior = ""
                 const UsersSession = Users + "/Session"
                 const UsersCreateSession = Users + "/CreateSession"
 
-
+/*
         app.get(UsersSession, (req, res) => {
                 console.log("Session Data:", req.session);
 
@@ -1490,7 +1495,19 @@ const Prior = ""
                         res.status(401).json({ error: "Not authenticated" });
                 }
         });
-
+*/
+        app.get("/Users/Session", (req, res) => {
+                console.log("📌 Checking Session Data:", req.session);
+                console.log("📌 Cookies Received:", req.headers.cookie); // Log cookies
+        
+                if (req.session?.user) {
+                console.log("✅ Session Found:", req.session.user);
+                return res.json({ userID: req.session.user.id });
+                } else {
+                console.log("❌ No User Session Found");
+                return res.status(401).json({ error: "Not authenticated" });
+                }
+        });
 
         app.post(UsersLogout, (req, res) => {
                 req.session.destroy((err) => {
@@ -1501,7 +1518,7 @@ const Prior = ""
                         }
                 });
         });
-
+/*
         app.post(UsersCreateSession, (req, res) => {
                 const username = req.body.Username
                 db.query(` 
@@ -1534,6 +1551,43 @@ const Prior = ""
                             
                 )
         });
+*/
+app.post("/Users/CreateSession", (req, res) => {
+        const username = req.body.Username;
+    
+        db.query(
+            `SELECT userID FROM Users WHERE Username = ?`,
+            [username],
+            (err, data) => {
+                if (err) {
+                    console.error("❌ Database Error:", err);
+                    return res.status(500).json({ error: "Database error" });
+                }
+    
+                if (data.length === 0) {
+                    console.log("❌ Invalid login attempt");
+                    return res.status(401).json({ error: "Invalid username or password" });
+                }
+    
+                // Store user in session
+                req.session.user = { id: data[0].userID };
+    
+                console.log("✅ Session Before Save:", req.session);
+    
+                req.session.save((saveErr) => {
+                    if (saveErr) {
+                        console.error("❌ Session Save Error:", saveErr);
+                        return res.status(500).json({ error: "Session save failed" });
+                    }
+    
+                    console.log("✅ Session After Save:", req.session);
+                    res.json({ userID: req.session.user.id });
+                });
+            }
+        );
+    });
+    
+        
 
         /*
                 .get parameters: [Path: str]
@@ -1866,9 +1920,9 @@ const Prior = ""
                 const username = req.body.Use
                 db.query(`
                         UPDATE Users 
-                        SET Username = ${username}
-                        WHERE UserID = ${user_id}
-                        `,
+                        SET Username = ?
+                        WHERE UserID = ?
+                        `, [username, user_id],
 
                         (err, data) => {
                                 if (err) {
@@ -1879,8 +1933,8 @@ const Prior = ""
                 db.query(`
                         SELECT Username
                         FROM Users
-                        WHERE UserID = ${user_id}
-                        `,
+                        WHERE UserID = ?
+                        `, [user_id],
                 
                         (err, data) =>{
                                 if (err) {
