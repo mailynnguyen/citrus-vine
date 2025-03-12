@@ -72,3 +72,6 @@ const Users = Prior + "/Users"
 
         export const UsersValidateAccount = Users + "/ValidateAccount"
         export const UsersDeleteAccount = Users + "/DeleteAccount"
+        export const UsersLogout = Users + "/Logout"
+        export const UsersSession = Users + "/Session"
+        export const UsersCreateSession = Users + "/CreateSession"

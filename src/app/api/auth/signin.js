@@ -1,5 +1,8 @@
 import express from 'express';
+import axios from "axios";
+import {UsersCreateSession} from "../../paths.js"
 import { findUserByUsername } from '../../models/userModels.js';
+
 
 
 const router = express.Router();
@@ -29,6 +32,9 @@ router.post('/signin', async (req, res) => {
       return res.status(401).json({ message: 'Invalid password' });
     }
     console.log("USER AUTHENTICATED SUCCESFULLY!");
+    const result = await axios.post(UsersCreateSession, {Username: username}, { withCredentials: true });
+
+    console.log("✅ Sign-In Successful. UserID:", result.data.userID);
     return res.status(200).json({ message: 'Authenticated successfully', user });
   } catch (err) {
     console.error(err);
