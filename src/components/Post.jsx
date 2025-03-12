@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { Heart } from 'lucide-react';
 import { MessageCircle } from "lucide-react";
 import '@/styles/post.css';
@@ -14,24 +14,30 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
     const [numLikes, setNumLikes] = useState(num_likes)
     const [like, setLike] = useState(is_liked);
 
-    console.log("[Post][userIDViewer]: ", userIDViewer)
-    console.log("[Post][postID]: ", postID)
+    // console.log("[Post][userIDViewer]: ", userIDViewer)
+    // console.log("[Post][postID]: ", postID)
     // console.log("[Post][numLikes]: ", numLikes)
     // console.log("[Post][like]: ", like)
+
+
     const Like = () => {
         setLike(!like)
         setNumLikes(numLikes + 1);
-        num_likes += 1;
         var res = axios.post(PostsIncrementLikes, {"PostID": postID, "UserID": userIDViewer})     
         console.log("[Post][Like()][axios.post]: ", res)
+        // numLikes = res.data[0].NumLikes
     }
     const Unlike = () => {
         setLike(!like)
         setNumLikes(numLikes - 1);
-        num_likes -= 1;
         var res = axios.post(PostsDecrementLikes, {"PostID": postID, "UserID": userIDViewer})
         console.log("[Post][Unlike()][axios.post]: ", res)
+        // numLikes = res.data[0].NumLikes
     }
+
+    useEffect(() => {
+
+    }, [like])
     
     return (
         <div id="post">

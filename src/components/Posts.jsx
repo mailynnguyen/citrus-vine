@@ -8,7 +8,7 @@ import {PostsFetch10AscTimestamp} from "@/app/paths";
 import { PostsFetch10DescTimestampOnUserID } from "@/app/paths";
 
 import "@/styles/posts.css"
-import { pages } from "next/dist/build/templates/app-page";
+// import { pages } from "next/dist/build/templates/app-page";
 
 const Posts = ({collectedText}) => {
 
@@ -74,7 +74,7 @@ const Posts = ({collectedText}) => {
     const resetPostsToDefault = async() => {
         setPage(1)
         try {
-            const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestampOnUserID?page=0&user_id=${userID}`)
+            const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestampOnUserID?page=1&user_id=${userID}`)
             setOriginalPosts(res.data)
             setPosts(res.data)
         } catch (err) {
@@ -131,7 +131,10 @@ const Posts = ({collectedText}) => {
     }, [])
 
     const FetchMoreAndFilter = async () => {
-        if (posts.length >= 10 || original_posts.length >= totalNumPosts) {
+        if (filterText.length==0) {
+            return;
+        }
+        if (posts.length >= page * 10 || original_posts.length == totalNumPosts) {
             return;
         }
         ogFetchAllPosts().then(() => {
@@ -144,12 +147,16 @@ const Posts = ({collectedText}) => {
     }
     var recently_ran = false;
     useEffect(() => {
-        filterPosts();
-        if (posts.length <= 10 && original_posts.length < totalNumPosts) {
-            setPage(page + 1)
-        }
-        // FetchMoreAndFilter();
         recently_ran = true;
+        if (filterText == "") {
+            resetPostsToDefault();
+            return;
+        }
+        filterPosts();
+        // if (posts.length <= 10 && original_posts.length < totalNumPosts) {
+        setPage(page + 1)
+        // }
+        FetchMoreAndFilter();
     },[filterText])
 
     // useEffect(() => {
@@ -161,7 +168,13 @@ const Posts = ({collectedText}) => {
 
     useEffect(() => {
         if (!recently_ran) {
-            FetchMoreAndFilter()
+            if (filterText.length > 0) {
+                FetchMoreAndFilter()
+            }
+            else {
+                ogFetchAllPosts();
+                fetchAllPosts();
+            }
         }     
     }, [page])
 
