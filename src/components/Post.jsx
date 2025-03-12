@@ -21,41 +21,39 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
     // console.log("[Post][like]: ", like)
 
 
-    const Like = () => {
+    const Like = async() => {
         setLike(!like)
-        setNumLikes(numLikes + 1);
         axios.post(PostsIncrementLikes, {"PostID": postID, "UserID": userIDViewer}).then((result) => {
-            console.log("[Post][Like()][axios.post]: ", res)
+            console.log("[Post][Like()][axios.post]: ", result)
+            setNumLikes(numLikes + 1)
         })
         // numLikes = res.data[0].NumLikes
     }
-    const Unlike = () => {
+    const Unlike = async() => {
         setLike(!like)
-        setNumLikes(numLikes - 1);
         axios.post(PostsDecrementLikes, {"PostID": postID, "UserID": userIDViewer}).then((result) => {
-            console.log("[Post][Unlike()][axios.post]: ", res)
+            console.log("[Post][Unlike()][axios.post]: ", result)
+            setNumLikes(numLikes - 1)
         })
         // numLikes = res.data[0].NumLikes
     }
 
 
-    const RefetchNumLikes = async () => {
-        axios.post(PostsGetLikes, {"PostID": postID}).then((result) =>
-            {
-                console.log("[Post][RefetchNumLikes]: ", result.data[0].Likes)
-                setNumLikes(result.data[0].Likes)
-            }
-        )
-    }
-    useEffect(() => {
-        if (!isMounted.current) {
-            isMounted.current = true;
-            return;
-        }
-        RefetchNumLikes()
-    }, [like])
-
-
+    // const RefetchNumLikes = async() => {
+    //     axios.post(PostsGetLikes, {"PostID": postID}).then((result) => {
+    //         // console.log("[Post][RefetchNumLikes]: ", result.data[0].Likes)
+    //         setNumLikes(result.data[0].Likes)
+    //         console.log(numLikes)
+    //     })
+    // }
+    // useEffect(() => {
+    //     if (!isMounted.current) {
+    //         isMounted.current = true;
+    //         return;
+    //     }
+        
+    //     // RefetchNumLikes()
+    // }, [like])
     
     
     return (
@@ -74,7 +72,7 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
                     {body}
                 </p>
 
-                <div className="post-button-holder">
+                <div className="post-button-holder" key={numLikes}>
                     <div className="post-like-button">
                             {like
                                 ? <Heart className="heart" id="heart-filled" onClick={() => Unlike()} fill="#BE4A31" strokeWidth={0} />

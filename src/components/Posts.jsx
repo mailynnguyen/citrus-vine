@@ -1,7 +1,7 @@
 "use client"
 import Post from "@/components/Post";
 import Button from "./Button";
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect,useRef} from "react";
 
 import axios from "axios";
 import {PostsFetch10AscTimestamp} from "@/app/paths";
@@ -10,8 +10,9 @@ import { PostsFetch10DescTimestampOnUserID } from "@/app/paths";
 import "@/styles/posts.css"
 // import { pages } from "next/dist/build/templates/app-page";
 
-const Posts = ({collectedText}) => {
+const Posts = ({collectedText, refresh_value}) => {
 
+    const [refresh, setRefresh] = useState(refresh_value)
     const [userID, setUserID] = useState(1) //HARDCODED REQUIRES UPDATE
 
     const [totalNumPosts, setTotalNumPosts] = useState()
@@ -19,8 +20,17 @@ const Posts = ({collectedText}) => {
     const [posts, setPosts] = useState([])
     const [page, setPage] = useState(1)
     const [filterText, setFilterText] = useState("")
+    const [showMoreAvailable, setShowMoreAvailable] = useState(true)
 
-
+    // const isMounted = useRef(false)
+    useEffect(() => {
+        // if (!isMounted.current) {
+        //     isMounted.current = true;
+        //     return;
+        // }
+        console.log("[Posts][Refresh]")
+        setFilterText(filterText)
+    }, [refresh])
 
     console.log("filterText: ", filterText)
     console.log("Length [original_posts]: ", original_posts.length)
@@ -74,6 +84,20 @@ const Posts = ({collectedText}) => {
     const resetPostsToDefault = async() => {
         setPage(1)
         try {
+            // setOriginalPosts([])
+            // setPosts([])
+            const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestampOnUserID?page=1&user_id=${userID}`)
+            setOriginalPosts(res.data)
+            setPosts(res.data)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    const hardResetPostsToDefault = async() => {
+        setPage(1)
+        try {
+            setOriginalPosts([])
+            setPosts([])
             const res = await axios.get(`http://localhost:3307/Posts/Fetch10DescTimestampOnUserID?page=1&user_id=${userID}`)
             setOriginalPosts(res.data)
             setPosts(res.data)
@@ -143,7 +167,6 @@ const Posts = ({collectedText}) => {
                     if (posts.length >= page * 10 || original_posts.length >= totalNumPosts) {
                         return;
                     }
-                    setPage(page + 1);
                 })
             })
         })
@@ -156,18 +179,21 @@ const Posts = ({collectedText}) => {
             return;
         }
         filterPosts();
-        // if (posts.length <= 10 && original_posts.length < totalNumPosts) {
         setPage(page + 1)
-        // }
         FetchMoreAndFilter();
     },[filterText])
 
-    // useEffect(() => {
-    //     filterPosts();
-    // },[page])
     const HandleClick = async () => {
-        resetPostsToDefault();
+        // resetPostsToDefault();
+        // ogFetchAllPosts();
+        // fetchAllPosts();
         setPage(page + 1);
+        if (original_posts.legnth >= totalNumPosts) {
+            setShowMoreAvailable(false)
+        }
+        else {
+            setShowMoreAvailable(true)
+        }
     }
 
     useEffect(() => {
@@ -176,7 +202,7 @@ const Posts = ({collectedText}) => {
                 FetchMoreAndFilter()
             }
             else {
-                resetPostsToDefault();
+                // resetPostsToDefault();
                 ogFetchAllPosts();
                 fetchAllPosts();
             }
@@ -184,9 +210,8 @@ const Posts = ({collectedText}) => {
     }, [page])
 
 
-
     return (
-        <div id="posts">
+        <div id="posts" key={{refresh_value, filterText}}>
             {posts
                 // .sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)) // Sort by date_time from earliest to latest
                 .map((post, index) => (
@@ -204,11 +229,15 @@ const Posts = ({collectedText}) => {
                     />
             ))}
 
-            <div id="posts-load-more-btn">
-                <Button title="Load More" onClick={(e) => {
-                    e.preventDefault(); 
-                    HandleClick(); 
-                }}/>
+            <div id="posts-load-more-btn"> 
+                {showMoreAvailable ?
+                    <Button title="Load More" onClick={(e) => {
+                        e.preventDefault(); 
+                        HandleClick(); 
+                    }}/>
+                    :
+                    <div></div>
+                }
             </div>
 
         </div>

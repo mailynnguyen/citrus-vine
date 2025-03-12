@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useState, useEffect }  from "react"
+import { useState, useEffect, useRef}  from "react"
 
 import SearchBar from "./SearchBar"
 import SideBar from "./SideBar"
@@ -10,8 +10,11 @@ import PostModal from "./PostModal"
 
 const Feed = () => {
 
+    const [refresh, setRefresh] = useState("")
     const [create, setCreate] = useState(false);
     const [collectedText, setCollectedText] = useState("")
+
+    const isMounted = useRef(false)
 
     useEffect(() => {
 
@@ -29,17 +32,26 @@ const Feed = () => {
       setCreate(false)
       document.body.style.overflow = "auto"; // Disable scrolling when modal is open
     }
+
+    useEffect (() => {
+      if (!isMounted.current) {
+        isMounted.current = true;
+        return;
+      }
+      setRefresh("refresh")
+      console.log("[Feed][Action] Create was changed.")
+    }, [create])
   
     return (
       <div>
-        <div>
+        <div key={create}>
           <SearchBar sendText = {setCollectedText}/>
-          <Posts collectedText={collectedText}/>
+          <Posts collectedText={collectedText} refresh_value={refresh}/>
         </div>
         
         <SideBar onClick={handleOpen}/>
   
-        {create ? <PostModal onClick={handleClose} setCreate={setCreate} /> : ""}
+        {create ? <PostModal onClick={handleClose} setCreate={setCreate}/> : ""}
       </div>
     );
 }
