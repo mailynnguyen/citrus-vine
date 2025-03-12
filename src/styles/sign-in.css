@@ -1,14 +1,19 @@
 @import url("https://fonts.googleapis.com/css?family=Indie Flower");
 
+body {
+    background-color: #7CA7E1; 
+    padding: 0;
+}
+
 #bg-holder {
     background-color: #7CA7E1;
     background-image: url("../images/citrus-bg.jpeg");
-    background-size: cover;
-    background-repeat: no-repeat;
+    background-position: center center;
+    background-blend-mode: multiply;
     width: 100vw;
     height: 100vh;
     margin: 0%;
-    padding: 0%;
+    padding-top: 5%;
 }
 
 .button-container {
@@ -128,7 +133,7 @@ input:focus::-ms-input-placeholder {
     font-size: 6rem;
     font-family: 'Indie Flower';
     text-align: center;
-    margin-top: 6%;
+    padding-top: 6%;
     color: white;
     pointer-events: none;
     user-select: none;

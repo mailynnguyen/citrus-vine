@@ -2,11 +2,7 @@
 
 body {
   background-color: #7CA7E1;
-  background-image: url("https://images.pexels.com/photos/3804878/pexels-photo-3804878.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-blend-mode: multiply;
+  padding: 0;
 }
 
 .email-container {
@@ -51,11 +47,14 @@ input[type=submit]:hover {
 }
 
 .sign-up-background {
-  background-image: url('../images/citrus-bg.jpeg');
-  background-size: "cover";
-  background-repeat: "repeat";
-  background-position: "center";
-  min-height: "100vh"
+  background-color: #7CA7E1;
+  background-image: url("../images/citrus-bg.jpeg");
+  background-position: center center;
+  background-blend-mode: multiply;
+  width: 100vw;
+  height: 100vh;
+  margin: 0%;
+  padding: 0%;
 }
 
 .sign-up-button {
@@ -158,8 +157,6 @@ input[type=submit]:hover {
 
 .title-container {
   padding-top: 5%;
-  margin-top: 0%;
-  margin-left: 0%;
   display: flex;
   flex-direction: column;
   align-items: center;

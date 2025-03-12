@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import '@/styles/sign-in.css';
 import { UsersFetchAll } from "@/app/paths";
+import CitrusBg from "../images/citrus-bg.jpeg";
 
 
 const InputField = ({fieldName, fieldPlaceHolder, type, fieldWidth, value, onChange}) => {
@@ -124,7 +125,7 @@ function SignIn() {
     if (!isClient) return null;
 
     return (
-        <>
+        <div id="bg-holder" style={{backgroundImage: `url(${CitrusBg.src})`}}>
             <div className="citrus-vine-text">Citrus Vine</div>
             <div className="sign-in-text">Sign In</div>
 
@@ -186,7 +187,7 @@ function SignIn() {
 
                 <button className="sign-in-button">Forgot password?</button>
             </div>
-        </>
+        </div>
     )
 }
 
