@@ -46,13 +46,13 @@ const Feed = () => {
     }, [create])
   
     return (
-      <div class="holder">
-        <div key={create} class="left">
+      <div className="holder">
+        <div key={create} className="left">
           <SearchBar sendText = {setCollectedText}/>
           <Posts collectedText={collectedText} refresh_value={refresh}/>
         </div>
         
-        <SideBar onClick={handleOpen} class="right"/>
+        <SideBar onClick={handleOpen} className="right"/>
   
         {create ? <PostModal onClick={handleClose} setCreate={setCreate}/> : ""}
       </div>

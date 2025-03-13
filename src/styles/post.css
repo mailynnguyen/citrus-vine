@@ -24,18 +24,19 @@
     align-items: center;
     gap: 1.5rem;
     font-weight: 700; /* bold */
-    margin: 15% 0 2% 0;
+    margin: .5rem 0;
 }
 
 .post-button-holder {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    margin-top: 15%;
-    margin-bottom: 1%;
+    margin: 1rem 0;
 }
 
-
+#display-name {
+    flex-grow: 0;
+}
 
 .time-stamp {
     color: #878787;
@@ -43,12 +44,10 @@
     font-weight: 400; /* regular */
 }
 
-
 .post-content {
     font-weight: 500; /* medium */
     margin-bottom: 2%;
 }
-
 
 .post-like-button {
     display: flex;
