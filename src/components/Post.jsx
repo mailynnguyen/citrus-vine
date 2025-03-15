@@ -77,16 +77,16 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
         <Suspense>
         <div id="post">
 
-            <div onClick={handleProfile}>
+            <div onClick={handleProfile} style={{cursor: "pointer"}}>
                 <img src={pfp} id="profile-pic"></img>
             </div>
 
             <div className="right-section">
 
                 <div id="title">
-                    <Link href="/" onClick={handleProfile}>
+                    <div onClick={handleProfile} style={{cursor: "pointer"}}>
                         <div id="display-name">{display_name}</div>
-                    </Link>
+                    </div>
                     <div className="time-stamp">{date_time}</div>
                 </div>
 
