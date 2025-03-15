@@ -14,6 +14,7 @@ const SideBar = ({ onClick }) => {
             console.log("clicked button");
             //await axios.post(UsersLogout, {}, { withCredentials: true });
             console.log("logged off");
+            router.push('/'); 
         } catch (err) {
             console.log("Error: ", err);
         }
@@ -30,7 +31,7 @@ const SideBar = ({ onClick }) => {
                 <div id="profile">
                     <div id="profile-pic" />
                     <p id="display-name">Katie</p>
-                    <div id="log-out-container" onClick={ClickLogout}>
+                    <div id="log-out-container" onClick={ClickLogout} style={{cursor: "pointer"}}>
                         <LogOut 
                             id="log-out" 
                             color="#C9C9C9" 
