@@ -33,6 +33,20 @@
     flex-shrink: 0;
 }
 
+#edit-profile-button {
+    background-color: #D9D9D9;
+    border-radius: 2rem;
+    padding: 0.5rem 2rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    #edit-profile-button{
+        background-color: #2e2e2e;
+    }
+}
+
 #side-bar-buttons {
     display: flex;
     flex-direction: column;
