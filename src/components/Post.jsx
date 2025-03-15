@@ -58,19 +58,27 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
     //     // RefetchNumLikes()
     // }, [like])
 
-    const [profile, setProfile] = useState(36);
+    const [profile, setProfile] = useState(0);
     const router = useRouter();
     const handleProfile = async() => {
         axios.post(UsersFetchOnPostID, {"PostID": postID}).then((res) => {
+            if(res.data.length > 0){
             setProfile(res.data[0].UserID)
             console.log(profile)
             console.log(res.data[0].UserID)
+            }
 
-            router.push(`/profile/${res.data[0].UserID}`);
+            //router.push(`/profile/${res.data[0].UserID}`);
             //router.push(`/profile/${profile}`)
         })
         
     }
+
+    useEffect(() => {
+        if(profile != 0) {
+            router.push(`/profile/${profile}`);
+        }
+    }, [profile])
 
     
     return (

@@ -1764,7 +1764,7 @@ const Prior = ""
         //I think this is very Not Secure. Oh well I guess.
         app.post(UsersFetchOnPostID, (req, res) => {
                 const post_id = req.body.PostID
-                db.query(`SELECT U.UserID FROM Users U, Posts P WHERE P.PostID = ${post_id} AND P.UserID = U.UserID`, (err, data) => {
+                db.query(`SELECT U.UserID FROM Users U, Posts P WHERE P.PostID = ${post_id} AND P.UserID = U.UserID AND P.Anonymous = 0`, (err, data) => {
                         if (err) {
                                 return res.json(err)
                         }
