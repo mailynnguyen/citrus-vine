@@ -55,6 +55,7 @@ const Comments = Prior + "/Comments"
 const Users = Prior + "/Users"
         export const UsersFetchAll = Users + "/FetchAll"
         export const UsersFetchOnID = Users + "/FetchOnID"
+        export const UsersFetchOnPostID = Users + "/FetchOnPostID"
 
         export const UsersInsertManual = Users + "/InsertManual"
         export const UsersInsertForward = Users + "/InsertFoward"

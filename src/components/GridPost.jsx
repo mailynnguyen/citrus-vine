@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { Heart, MessageCircle } from "lucide-react";
 import "@/styles/gridpost.css";
 
@@ -8,6 +8,7 @@ const GridPost = ({body, date_time, display_name, pfp, num_likes, num_comments})
   const [like, setLike] = useState(false);
 
   return (
+    <Suspense>
     <div className="gridpost">
       <div className="gridpost-info-holder">
         <img src={"/" + pfp} className="gridpost-profile-pic"></img>
@@ -40,7 +41,7 @@ const GridPost = ({body, date_time, display_name, pfp, num_likes, num_comments})
         </div>
       </div>
     </div>
-
+    </Suspense>
   )
 }
 

@@ -1,8 +1,14 @@
 "use client"
-import Feed from "../../components/Feed";
-import React, { useState } from "react";
 
+import { Suspense } from "react"
+import Feed from "../../components/Feed";
 
 export default function App() {
-    return <Feed />;
+    return (
+        <div>
+            <Suspense>
+                <Feed />
+            </Suspense>
+        </div>
+    );
 }

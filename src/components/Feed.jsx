@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useState, useEffect, useRef}  from "react"
+import { useState, useEffect, useRef, Suspense}  from "react"
 
 import SearchBar from "./SearchBar"
 import SideBar from "./SideBar"
@@ -46,6 +46,7 @@ const Feed = () => {
     }, [create])
   
     return (
+      <Suspense>
       <div className="holder">
         <div key={create} className="left">
           <SearchBar sendText = {setCollectedText}/>
@@ -56,6 +57,7 @@ const Feed = () => {
   
         {create ? <PostModal onClick={handleClose} setCreate={setCreate}/> : ""}
       </div>
+      </Suspense>
     );
 }
 

@@ -1,7 +1,7 @@
 "use client"
 import Post from "@/components/Post";
 import Button from "./Button";
-import React, { useState, useEffect,useRef} from "react";
+import React, { useState, useEffect,useRef, Suspense} from "react";
 
 import axios from "axios";
 import {PostsFetch10AscTimestamp} from "@/app/paths";
@@ -223,6 +223,7 @@ const Posts = ({collectedText, refresh_value}) => {
 
 
     return (
+        <Suspense>
         <div id="posts" key={{refresh_value, filterText}}>
             {posts
                 // .sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)) // Sort by date_time from earliest to latest
@@ -253,6 +254,7 @@ const Posts = ({collectedText, refresh_value}) => {
             </div>
 
         </div>
+        </Suspense>
     )
 }
 
