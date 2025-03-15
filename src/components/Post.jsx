@@ -1,11 +1,14 @@
 "use client"
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { Heart } from 'lucide-react';
 import { MessageCircle } from "lucide-react";
 import '@/styles/post.css';
 
+import Link from "next/link";
+import { useRouter } from 'next/navigation';
+
 import axios from "axios";
-import { PostsIncrementLikes, PostsDecrementLikes, PostsGetLikes} from "@/app/paths";
+import { PostsIncrementLikes, PostsDecrementLikes, PostsGetLikes, UsersFetchOnPostID} from "@/app/paths";
 
 const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comments, is_liked, user_id_viewer}) => {
 
@@ -54,17 +57,36 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
         
     //     // RefetchNumLikes()
     // }, [like])
-    
+
+    const [profile, setProfile] = useState(36);
+    const router = useRouter();
+    const handleProfile = async() => {
+        axios.post(UsersFetchOnPostID, {"PostID": postID}).then((res) => {
+            setProfile(res.data[0].UserID)
+            console.log(profile)
+            console.log(res.data[0].UserID)
+
+            router.push(`/profile/${res.data[0].UserID}`);
+            //router.push(`/profile/${profile}`)
+        })
+        
+    }
+
     
     return (
+        <Suspense>
         <div id="post">
 
-            <img src={pfp} id="profile-pic"></img>
+            <div onClick={handleProfile}>
+                <img src={pfp} id="profile-pic"></img>
+            </div>
 
             <div className="right-section">
 
                 <div id="title">
-                    <div id="display-name">{display_name}</div>
+                    <Link href="/" onClick={handleProfile}>
+                        <div id="display-name">{display_name}</div>
+                    </Link>
                     <div className="time-stamp">{date_time}</div>
                 </div>
 
@@ -90,6 +112,7 @@ const Post = ({ post_id, body, date_time, display_name, pfp, num_likes, num_comm
             </div>
 
         </div>
+        </Suspense>
     )
 }
 

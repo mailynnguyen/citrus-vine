@@ -1,7 +1,7 @@
 "use client"
 import GridPost from "@/components/GridPost";
 import Button from "./Button";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import axios from "axios";
 
 import "@/styles/gridposts.css"
@@ -29,6 +29,7 @@ const GridPosts = ( {id} ) => {
 
 
     return (
+        <Suspense>
         <div id="posts">
             {gridPosts
                 // .sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)) // Sort by date_time from earliest to latest
@@ -45,6 +46,7 @@ const GridPosts = ( {id} ) => {
             ))}
 
         </div>
+        </Suspense>
     )
 }
 

@@ -1,7 +1,7 @@
 import ProfileHeader from "@/components/ProfileHeader";
 import GridPosts from "@/components/GridPosts";
 
-import GridPost from "@/components/GridPost";
+import { Suspense } from "react"
 
 export async function generateStaticParams() {
     const users = await fetch('http://localhost:3307/Users/FetchAll').then((res) => res.json())
@@ -17,8 +17,10 @@ export default async function Page({ params }) {
     return(
         {slug} && 
         <div>
-            <ProfileHeader id={slug}></ProfileHeader>
-            <GridPosts id={slug}></GridPosts>
+            <Suspense>
+                <ProfileHeader id={slug}></ProfileHeader>
+                <GridPosts id={slug}></GridPosts>
+            </Suspense>
         </div>
 
     )

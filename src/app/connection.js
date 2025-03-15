@@ -1647,6 +1647,7 @@ const Prior = ""
         const Users = Prior + "/Users"
                 const UsersFetchAll = Users + "/FetchAll"
                 const UsersFetchOnID = Users + "/FetchOnID"
+                const UsersFetchOnPostID = Users + "/FetchOnPostID"
 
                 const UsersInsertManual = Users + "/InsertManual"
                 const UsersInsertForward = Users + "/InsertFoward"
@@ -1751,6 +1752,19 @@ const Prior = ""
         app.post(UsersFetchOnID, (req, res) => {
                 const user_id = req.body.UserID
                 db.query(`SELECT Username, Bio, AssignedProfilePic FROM Users WHERE UserID = ${user_id}`, (err, data) => {
+                        if (err) {
+                                return res.json(err)
+                        }
+                        else {
+                                return res.json(data)
+                        }
+                });
+        });
+
+        //I think this is very Not Secure. Oh well I guess.
+        app.post(UsersFetchOnPostID, (req, res) => {
+                const post_id = req.body.PostID
+                db.query(`SELECT U.UserID FROM Users U, Posts P WHERE P.PostID = ${post_id} AND P.UserID = U.UserID`, (err, data) => {
                         if (err) {
                                 return res.json(err)
                         }
